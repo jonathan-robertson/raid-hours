@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33403.182
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RaidHours", "RaidHours\RaidHours.csproj", "{58B962AB-8218-4D38-B32B-13FABF746D90}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{58B962AB-8218-4D38-B32B-13FABF746D90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58B962AB-8218-4D38-B32B-13FABF746D90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58B962AB-8218-4D38-B32B-13FABF746D90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58B962AB-8218-4D38-B32B-13FABF746D90}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {405C68E3-9EE9-4E0C-9C93-A81C9BDDE817}
+	EndGlobalSection
+EndGlobal
