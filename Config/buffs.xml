@@ -24,5 +24,17 @@
                 <triggered_effect trigger="onSelfBuffStart" action="RemoveBuff" buff="stateBuildMode" />
             </effect_group>
         </buff>
+        <buff name="antiZombieRaidProtection" hidden="true">
+            <duration value="2" />
+            <stack_type value="effect" />
+            <effect_group>
+                <passive_effect name="BuffBlink" operation="base_set" value="2" duration="0,3" tags="stateBuildMode" />
+
+                <triggered_effect trigger="onSelfBuffStart" action="ShowToolbeltMessage" message_key="antiZombieRaidProtectionTooltip" sound="build_mode_active" />
+                <triggered_effect trigger="onSelfBuffStack" action="ShowToolbeltMessage" message_key="antiZombieRaidProtectionTooltip" sound="build_mode_active" />
+
+                <!-- TODO: add.. particle effect? :] -->
+            </effect_group>
+        </buff>
     </append>
 </config>
