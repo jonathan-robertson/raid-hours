@@ -13,13 +13,17 @@ namespace RaidHours
     {
         private static readonly ModLog<ModApi> _log = new ModLog<ModApi>();
 
-        // TODO: update this later to be a variable that can be changed from the admin console
-        private static readonly TimeZoneInfo _timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("America/Chicago");
-        private static readonly TimeTrigger _raidStart = new TimeTrigger(hourOfDay: 19); // 7pm
-        private static readonly TimeTrigger _raidStop = new TimeTrigger(hourOfDay: 23); // 11pm
+        private TimeZoneInfo _timeZoneInfo;
+
+        // TODO: load from file
+        internal ModSettings Settings { get; private set; } = new ModSettings()
+        {
+            TimeZone = "Central Standard Time", //"America/Chicago",
+            StartTime = new TimeTrigger(hourOfDay: 19), // 7pm
+            StopTime = new TimeTrigger(hourOfDay: 23), // 11pm
+        };
 
         public Coroutine TimeMonitorCoroutine { get; private set; }
-        public static bool DebugMode { get; set; } = false;
         public static int DefaultLandClaimOnlineDurabilityModifier { get; private set; }
         public static int DefaultLandClaimOfflineDurabilityModifier { get; private set; }
         public static GameState CurrentState { get; private set; }
@@ -28,12 +32,22 @@ namespace RaidHours
         public string BuffRaidModeName { get; private set; } = "stateRaidMode";
         public string CVarDefaultDefenseOnlineName { get; private set; } = "RaidHoursDefaultDefenseOnline";
         public string CVarDefaultDefenseOfflineName { get; private set; } = "RaidHoursDefaultDefenseOffline";
+        public static bool DebugMode { get; set; } = true; // TODO: set to false before release
 
         public void InitMod(Mod _modInstance)
         {
-            ModEvents.GameStartDone.RegisterHandler(OnGameStartDone);
-            ModEvents.PlayerSpawnedInWorld.RegisterHandler(OnPlayerSpawnedInWorld);
-            ModEvents.GameShutdown.RegisterHandler(OnGameShutdown);
+            try
+            {
+                _timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(Settings.TimeZone);
+
+                ModEvents.GameStartDone.RegisterHandler(OnGameStartDone);
+                ModEvents.PlayerSpawnedInWorld.RegisterHandler(OnPlayerSpawnedInWorld);
+                ModEvents.GameShutdown.RegisterHandler(OnGameShutdown);
+            }
+            catch (Exception e)
+            {
+                _log.Error("Failed InitMod", e);
+            }
         }
 
         private void OnPlayerSpawnedInWorld(ClientInfo _clientInfo, RespawnType _respawnType, Vector3i _pos)
@@ -41,11 +55,27 @@ namespace RaidHours
             try
             {
                 _log.Trace("OnPlayerSpawnedInWorld");
+
+                // local players
+                if (_clientInfo == null)
+                {
+                    var localPlayers = GameManager.Instance.World.GetLocalPlayers();
+                    for (var i = 0; i < localPlayers.Count; i++)
+                    {
+                        localPlayers[i].SetCVar(CVarDefaultDefenseOnlineName, DefaultLandClaimOnlineDurabilityModifier);
+                        localPlayers[i].SetCVar(CVarDefaultDefenseOfflineName, DefaultLandClaimOfflineDurabilityModifier);
+                    }
+                    HandleStateChange(CurrentState, localPlayers.ToArray());
+                    return;
+                }
+
+                // remote players
                 if (GameManager.Instance.World.Players.dict.TryGetValue(_clientInfo.entityId, out var player))
                 {
                     player.SetCVar(CVarDefaultDefenseOnlineName, DefaultLandClaimOnlineDurabilityModifier);
                     player.SetCVar(CVarDefaultDefenseOfflineName, DefaultLandClaimOfflineDurabilityModifier);
-                    CheckAndHandleStateChange(player);
+                    HandleStateChange(CurrentState, player);
+                    return;
                 }
             }
             catch (Exception e)
@@ -72,7 +102,7 @@ namespace RaidHours
             try
             {
                 _log.Trace("OnGameShutdown");
-                ThreadManager.StopCoroutine(TimeMonitorCoroutine); // TODO: might not be necessary
+                ThreadManager.StopCoroutine(TimeMonitorCoroutine);
             }
             catch (Exception e)
             {
@@ -96,8 +126,9 @@ namespace RaidHours
 
         private void CheckAndHandleStateChange(params EntityPlayer[] players)
         {
+            _log.Trace($"CheckAndHandleStateChange: {players.Length}");
             var currentTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, _timeZoneInfo);
-            CurrentState = _raidStop.MinutesUntil(currentTime) < _raidStart.MinutesUntil(currentTime)
+            CurrentState = Settings.StopTime.MinutesUntil(currentTime) < Settings.StartTime.MinutesUntil(currentTime)
                 ? GameState.Raid
                 : GameState.Build;
 
@@ -110,6 +141,7 @@ namespace RaidHours
 
         private void HandleStateChange(GameState newState, params EntityPlayer[] players)
         {
+            _log.Trace($"HandleStateChange: {newState}, {players.Length}");
             int onlineModifier, offlineModifier;
             string buff;
             if (newState == GameState.Build)
@@ -131,7 +163,7 @@ namespace RaidHours
             if (players.Length == 0)
             {
                 var playerList = GameManager.Instance.World.Players.list;
-                ConnectionManager.Instance.SendPackage(netPackage); // TODO: confirm this sends to all connected clients
+                ConnectionManager.Instance.SendPackage(netPackage); // TODO: confirm this sends to all connected clients and local players
                 for (var i = 0; i < playerList.Count; i++)
                 {
                     _ = playerList[i].Buffs.AddBuff(buff);
@@ -141,11 +173,10 @@ namespace RaidHours
             {
                 for (var i = 0; i < players.Length; i++)
                 {
-                    var clientInfo = ConnectionManager.Instance.Clients.ForEntityId(players[i].entityId);
-                    if (clientInfo != null)
+                    _ = players[i].Buffs.AddBuff(buff);
+                    if (players[i].isEntityRemote)
                     {
-                        clientInfo.SendPackage(netPackage);
-                        _ = players[i].Buffs.AddBuff(buff);
+                        ConnectionManager.Instance.Clients.ForEntityId(players[i].entityId)?.SendPackage(netPackage);
                     }
                 }
             }
