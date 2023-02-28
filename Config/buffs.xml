@@ -1,3 +1,28 @@
 <config>
-    <!-- TODO -->
+    <append xpath="/buffs">
+        <buff name="stateBuildMode" name_key="stateBuildModeName" description_key="stateModeDesc" icon="ui_game_symbol_brick" icon_color="0,255,128" remove_on_death="false">
+            <duration value="0" />
+            <stack_type value="effect" />
+            <display_value value="xxx" />
+            <display_value_key value="Build" />
+            <effect_group>
+                <triggered_effect trigger="onSelfBuffStart" action="ShowToolbeltMessage" message_key="stateBuildModeTooltip" sound="build_mode_active" />
+                <triggered_effect trigger="onSelfBuffStack" action="ShowToolbeltMessage" message_key="stateBuildModeTooltip" sound="build_mode_active" />
+
+                <triggered_effect trigger="onSelfBuffStart" action="RemoveBuff" buff="stateRaidMode" />
+            </effect_group>
+        </buff>
+        <buff name="stateRaidMode" name_key="stateRaidModeName" description_key="stateModeDesc" icon="ui_game_symbol_wrecking_ball" icon_color="255,0,127" remove_on_death="false">
+            <duration value="0" />
+            <stack_type value="effect" />
+            <display_value value="xxx" />
+            <display_value_key value="Raid" />
+            <effect_group>
+                <triggered_effect trigger="onSelfBuffStart" action="ShowToolbeltMessage" message_key="stateRaidModeTooltip" sound="raid_mode_active" />
+                <triggered_effect trigger="onSelfBuffStack" action="ShowToolbeltMessage" message_key="stateRaidModeTooltip" sound="raid_mode_active" />
+
+                <triggered_effect trigger="onSelfBuffStart" action="RemoveBuff" buff="stateBuildMode" />
+            </effect_group>
+        </buff>
+    </append>
 </config>

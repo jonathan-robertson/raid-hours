@@ -7,5 +7,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- TODO: add scheduled lcb defense changes for build/raid times
+- add scheduled lcb defense for build/raid times
 - TODO: add zombie raid protection during build time
