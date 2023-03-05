@@ -96,7 +96,6 @@ namespace RaidHours
                 if (TryGetTimeZoneInfo(loadedSettings.TimeZoneString, out var timeZoneInfo))
                 {
                     TimeZoneInfo = timeZoneInfo;
-                    _log.Info($"Successfully loaded {filename}");
                 }
                 else
                 {

@@ -19,4 +19,5 @@ TODO: ![raid-hours social image](https://raw.githubusercontent.com/jonathan-robe
 
 ## Features
 
-TODO
+- admin can enter any claim's zone at any time by first entering spectator mode (`sm`)
+- TODO

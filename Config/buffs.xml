@@ -1,10 +1,10 @@
 <config>
     <append xpath="/buffs">
-        <buff name="raidHoursBuildMode" name_key="raidHoursBuildModeName" description_key="raidHoursModeDesc" icon="ui_game_symbol_brick" icon_color="0,255,128" remove_on_death="false">
+        <buff name="raidHoursBuildMode" name_key="raidHoursClaimModeName" description_key="raidHoursClaimModeDesc" icon="ui_game_symbol_brick" icon_color="0,255,128" remove_on_death="false">
             <duration value="0" />
             <stack_type value="effect" />
             <display_value value="xxx" />
-            <display_value_key value="Build" />
+            <display_value_key value="[[00FF80]BUILD[-]]" />
             <effect_group>
                 <triggered_effect trigger="onSelfBuffStart" action="ShowToolbeltMessage" message_key="raidHoursBuildModeTooltip" sound="build_mode_active" />
                 <triggered_effect trigger="onSelfBuffStack" action="ShowToolbeltMessage" message_key="raidHoursBuildModeTooltip" sound="build_mode_active" />
@@ -12,11 +12,11 @@
                 <triggered_effect trigger="onSelfBuffStart" action="RemoveBuff" buff="raidHoursRaidMode" />
             </effect_group>
         </buff>
-        <buff name="raidHoursRaidMode" name_key="raidHoursRaidModeName" description_key="raidHoursModeDesc" icon="ui_game_symbol_wrecking_ball" icon_color="255,0,127" remove_on_death="false">
+        <buff name="raidHoursRaidMode" name_key="raidHoursClaimModeName" description_key="raidHoursClaimModeDesc" icon="ui_game_symbol_wrecking_ball" icon_color="255,0,127" remove_on_death="false">
             <duration value="0" />
             <stack_type value="effect" />
             <display_value value="xxx" />
-            <display_value_key value="Raid" />
+            <display_value_key value="[[FF007F]RAID[-]]" />
             <effect_group>
                 <triggered_effect trigger="onSelfBuffStart" action="ShowToolbeltMessage" message_key="raidHoursRaidModeTooltip" sound="raid_mode_active" />
                 <triggered_effect trigger="onSelfBuffStack" action="ShowToolbeltMessage" message_key="raidHoursRaidModeTooltip" sound="raid_mode_active" />

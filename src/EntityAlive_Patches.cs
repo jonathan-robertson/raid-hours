@@ -104,9 +104,9 @@ namespace RaidHours
 
         private static void Eject(EntityPlayer player)
         {
-            if (player.IsFlyMode.Value)
+            if (player.IsSpectator)
             {
-                return;
+                return; // allow admins to access any land claim at any time... invisibly!
             }
 
             var rand = player.world.GetGameRandom();

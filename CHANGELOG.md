@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [TODO]
+## [CONSIDERING]
 
 - add admin command to enable/disable schedule feature and return to default server state immediately?
 - add more info to readme
@@ -21,3 +21,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add mechanic to trigger raid protection
 - add particle effects and sound on warp
 - add scheduled lcb defense for build/raid times
+- adjust formatting/colors of build/raid/protect panels
+- prevent warp from happening for spectator
