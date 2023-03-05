@@ -23,29 +23,11 @@ namespace RaidHours
         public static string CVarDefaultDefenseOnlineName { get; private set; } = "raidHoursDefaultDefenseOnline";
         public static string CVarDefaultDefenseOfflineName { get; private set; } = "raidHoursDefaultDefenseOffline";
 
-        internal static void OnPlayerSpawnedInWorld(ClientInfo _clientInfo)
+        internal static void OnPlayerSpawnedInWorld(EntityPlayer player)
         {
-            // local players
-            if (_clientInfo == null)
-            {
-                var localPlayers = GameManager.Instance.World.GetLocalPlayers();
-                for (var i = 0; i < localPlayers.Count; i++)
-                {
-                    localPlayers[i].SetCVar(CVarDefaultDefenseOnlineName, DefaultLandClaimOnlineDurabilityModifier);
-                    localPlayers[i].SetCVar(CVarDefaultDefenseOfflineName, DefaultLandClaimOfflineDurabilityModifier);
-                }
-                HandleStateChange(CurrentState, localPlayers.ToArray());
-                return;
-            }
-
-            // remote players
-            if (GameManager.Instance.World.Players.dict.TryGetValue(_clientInfo.entityId, out var player))
-            {
-                player.SetCVar(CVarDefaultDefenseOnlineName, DefaultLandClaimOnlineDurabilityModifier);
-                player.SetCVar(CVarDefaultDefenseOfflineName, DefaultLandClaimOfflineDurabilityModifier);
-                HandleStateChange(CurrentState, player);
-                return;
-            }
+            player.SetCVar(CVarDefaultDefenseOnlineName, DefaultLandClaimOnlineDurabilityModifier);
+            player.SetCVar(CVarDefaultDefenseOfflineName, DefaultLandClaimOfflineDurabilityModifier);
+            HandleStateChange(CurrentState, player);
         }
 
         internal static void OnGameStartDone()
