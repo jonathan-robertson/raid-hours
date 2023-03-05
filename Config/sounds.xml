@@ -1,0 +1,23 @@
+﻿<config>
+    <append xpath="/Sounds">
+        <SoundDataNode name="build_mode_active">
+            <AudioSource name="Sounds/AudioSource_Impact_Small" />
+            <AudioClip ClipName="Sounds/Misc/keystone_placed" />
+            <LocalCrouchVolumeScale value="1.0" />
+            <CrouchNoiseScale value="1.0" />
+            <NoiseScale value="1" />
+            <MaxVoices value="3" />
+            <MaxRepeatRate value="0.01" />
+        </SoundDataNode>
+
+        <SoundDataNode name="raid_mode_active">
+            <AudioSource name="Sounds/AudioSource_Impact_Small" />
+            <AudioClip ClipName="Sounds/Quests/Restore_Power/quest_restore_power_complete" />
+            <LocalCrouchVolumeScale value="1.0" />
+            <CrouchNoiseScale value="1.0" />
+            <NoiseScale value="1" />
+            <MaxVoices value="3" />
+            <MaxRepeatRate value="0.01" />
+        </SoundDataNode>
+    </append>
+</config>

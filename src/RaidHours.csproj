@@ -62,8 +62,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConsoleCmdRaidHours.cs" />
+    <Compile Include="EntityAlive_Patches.cs" />
     <Compile Include="ModApi.cs" />
+    <Compile Include="ModLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SettingsManager.cs" />
+    <Compile Include="ScheduleManager.cs" />
+    <Compile Include="TimeTrigger.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

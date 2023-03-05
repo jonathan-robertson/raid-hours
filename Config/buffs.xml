@@ -1,3 +1,71 @@
 <config>
-    <!-- TODO -->
+    <append xpath="/buffs">
+        <buff name="raidHoursBuildMode" name_key="raidHoursClaimModeName" description_key="raidHoursClaimModeDesc" icon="ui_game_symbol_brick" icon_color="0,255,128" remove_on_death="false">
+            <duration value="0" />
+            <stack_type value="effect" />
+            <display_value value="xxx" />
+            <display_value_key value="[[00FF80]BUILD[-]]" />
+            <effect_group>
+                <triggered_effect trigger="onSelfBuffStart" action="ShowToolbeltMessage" message_key="raidHoursBuildModeTooltip" sound="build_mode_active" />
+                <triggered_effect trigger="onSelfBuffStack" action="ShowToolbeltMessage" message_key="raidHoursBuildModeTooltip" sound="build_mode_active" />
+
+                <triggered_effect trigger="onSelfBuffStart" action="RemoveBuff" buff="raidHoursRaidMode" />
+            </effect_group>
+        </buff>
+        <buff name="raidHoursRaidMode" name_key="raidHoursClaimModeName" description_key="raidHoursClaimModeDesc" icon="ui_game_symbol_wrecking_ball" icon_color="255,0,127" remove_on_death="false">
+            <duration value="0" />
+            <stack_type value="effect" />
+            <display_value value="xxx" />
+            <display_value_key value="[[FF007F]RAID[-]]" />
+            <effect_group>
+                <triggered_effect trigger="onSelfBuffStart" action="ShowToolbeltMessage" message_key="raidHoursRaidModeTooltip" sound="raid_mode_active" />
+                <triggered_effect trigger="onSelfBuffStack" action="ShowToolbeltMessage" message_key="raidHoursRaidModeTooltip" sound="raid_mode_active" />
+
+                <triggered_effect trigger="onSelfBuffStart" action="RemoveBuff" buff="raidHoursBuildMode" />
+            </effect_group>
+        </buff>
+
+        <buff name="raidHoursRaidProtection" name_key="raidProtectionName" description_key="raidProtectionDesc" icon="ui_game_symbol_frames" icon_color="0,255,128">
+            <duration value="0" />
+            <stack_type value="replace" />
+            <display_value value="raidHoursRaidProtection" />
+            <display_value_key value="{0:[[00FF80]ON[-]];[[FF007F]OFF[-]];[_]}" />
+
+            <effect_group name="handle-timer">
+                <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar=".raidHoursRaidProtectionTimer" operation="set" value="2" />
+                <triggered_effect trigger="onSelfBuffStack" action="ModifyCVar" cvar=".raidHoursRaidProtectionTimer" operation="set" value="2" />
+
+                <triggered_effect trigger="onSelfBuffUpdate" action="ModifyCVar" cvar=".raidHoursRaidProtectionTimer" operation="subtract" value="1">
+                    <requirement name="CVarCompare" cvar=".raidHoursRaidProtectionTimer" operation="GT" value="0" />
+                </triggered_effect>
+
+                <triggered_effect trigger="onSelfBuffUpdate" action="ModifyCVar" cvar=".raidHoursRaidProtectionTimer" operation="set" value="0">
+                    <requirement name="CVarCompare" cvar=".raidHoursRaidProtectionTimer" operation="LT" value="0" />
+                </triggered_effect>
+
+                <triggered_effect trigger="onSelfBuffUpdate" action="RemoveBuff" buff="raidHoursRaidProtection">
+                    <requirement name="CVarCompare" cvar=".raidHoursRaidProtectionTimer" operation="LTE" value="0" />
+                </triggered_effect>
+            </effect_group>
+        </buff>
+        <buff name="raidHoursRaidProtectionWarp" hidden="true">
+            <duration value="2" />
+            <stack_type value="effect" />
+            <effect_group>
+                <passive_effect name="BuffBlink" operation="base_set" value="2" duration="0,3" tags="raidHoursBuildMode" />
+
+                <triggered_effect trigger="onSelfBuffStart" action="ShowToolbeltMessage" message_key="raidHoursRaidProtectionWarpTooltip" />
+                <triggered_effect trigger="onSelfBuffStack" action="ShowToolbeltMessage" message_key="raidHoursRaidProtectionWarpTooltip" />
+
+                <triggered_effect trigger="onSelfBuffStart" action="PlaySound" sound="solarpanel_on" play_in_head="false" />
+                <triggered_effect trigger="onSelfBuffStack" action="PlaySound" sound="solarpanel_on" play_in_head="false" />
+
+                <triggered_effect trigger="onSelfBuffStart" action="AttachParticleEffectToEntity" particle="RadiatedParticlesOnMesh" parent_transform="LOD0" shape_mesh="true" />
+                <triggered_effect trigger="onSelfDied" action="RemoveParticleEffectFromEntity" particle="RadiatedParticlesOnMesh" />
+                <triggered_effect trigger="onSelfBuffFinish" action="RemoveParticleEffectFromEntity" particle="RadiatedParticlesOnMesh" />
+                <triggered_effect trigger="onSelfBuffRemove" action="RemoveParticleEffectFromEntity" particle="RadiatedParticlesOnMesh" />
+                <triggered_effect trigger="onSelfLeaveGame" action="RemoveParticleEffectFromEntity" particle="RadiatedParticlesOnMesh" />
+            </effect_group>
+        </buff>
+    </append>
 </config>
