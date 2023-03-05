@@ -39,6 +39,7 @@ namespace RaidHours
         internal static void OnGameShutdown()
         {
             ThreadManager.StopCoroutine(TimeMonitorCoroutine);
+            _log.Info("Stopped time monitor coroutine");
         }
 
         private static IEnumerator MonitorTime()
