@@ -13,17 +13,15 @@ namespace RaidHours
     {
         private static readonly ModLog<ScheduleManager> _log = new ModLog<ScheduleManager>();
 
-        private static TimeZoneInfo _timeZoneInfo;
-
         public static Coroutine TimeMonitorCoroutine { get; private set; }
         public static int DefaultLandClaimOnlineDurabilityModifier { get; private set; }
         public static int DefaultLandClaimOfflineDurabilityModifier { get; private set; }
         public static GameState CurrentState { get; private set; }
         public static GameState PreviousState { get; private set; }
-        public static string BuffBuildModeName { get; private set; } = "stateBuildMode";
-        public static string BuffRaidModeName { get; private set; } = "stateRaidMode";
-        public static string CVarDefaultDefenseOnlineName { get; private set; } = "RaidHoursDefaultDefenseOnline";
-        public static string CVarDefaultDefenseOfflineName { get; private set; } = "RaidHoursDefaultDefenseOffline";
+        public static string BuffBuildModeName { get; private set; } = "raidHoursBuildMode";
+        public static string BuffRaidModeName { get; private set; } = "raidHoursRaidMode";
+        public static string CVarDefaultDefenseOnlineName { get; private set; } = "raidHoursDefaultDefenseOnline";
+        public static string CVarDefaultDefenseOfflineName { get; private set; } = "raidHoursDefaultDefenseOffline";
 
         internal static void OnPlayerSpawnedInWorld(ClientInfo _clientInfo)
         {
@@ -52,7 +50,7 @@ namespace RaidHours
 
         internal static void OnGameStartDone()
         {
-            _timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(Settings.TimeZone);
+            SettingsManager.Load();
             TimeMonitorCoroutine = ThreadManager.StartCoroutine(MonitorTime());
         }
 
@@ -75,11 +73,10 @@ namespace RaidHours
             }
         }
 
-        private static void CheckAndHandleStateChange(params EntityPlayer[] players)
+        internal static void CheckAndHandleStateChange(params EntityPlayer[] players)
         {
-            _log.Trace($"CheckAndHandleStateChange: {players.Length}");
-            var currentTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, _timeZoneInfo);
-            CurrentState = Settings.RaidModeStopTime.MinutesUntil(currentTime) < Settings.RaidModeStartTime.MinutesUntil(currentTime)
+            var currentTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, SettingsManager.TimeZoneInfo);
+            CurrentState = SettingsManager.RaidModeStopTime.MinutesUntil(currentTime) < SettingsManager.RaidModeStartTime.MinutesUntil(currentTime)
                 ? GameState.Raid
                 : GameState.Build;
 

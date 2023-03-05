@@ -2,11 +2,11 @@
 
 namespace RaidHours
 {
-    internal class TimeTrigger
+    public class TimeTrigger
     {
-        private readonly DayOfWeek? DayOfWeek;
-        private readonly int? HourOfDay;
-        private readonly int MinOfHour;
+        public DayOfWeek? DayOfWeek;
+        public int? HourOfDay;
+        public int MinOfHour = 0;
 
         public TimeTrigger(DayOfWeek? dayOfWeek = null, int? hourOfDay = null, int minOfHour = 0)
         {
@@ -44,6 +44,25 @@ namespace RaidHours
             }
 
             return UntilNextMinOfHour(dt, MinOfHour, wrap: true);
+        }
+
+        public override string ToString()
+        {
+            return $"[DayOfWeek: {DayOfWeek}, HourOfDay: {HourOfDay}, MinOfHour: {MinOfHour}]";
+        }
+
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj) &&
+                obj is TimeTrigger other &&
+                DayOfWeek == other.DayOfWeek &&
+                HourOfDay == other.HourOfDay &&
+                MinOfHour == other.MinOfHour;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
 
         public static int UntilNextDayOfWeek(DateTime dt, DayOfWeek dayOfWeek, bool wrap = true)

@@ -14,7 +14,7 @@ namespace RaidHours
 
         internal static bool IsServer { get; private set; }
 
-        internal static bool DebugMode { get; set; } = true; // TODO: set to false before release
+        internal static bool DebugMode { get; set; } = false;
 
         public void InitMod(Mod _modInstance)
         {
@@ -34,7 +34,7 @@ namespace RaidHours
                 if (IsServer)
                 {
                     _log.Trace("OnGameStartDone");
-                    LandClaimSize = GameStats.GetInt(EnumGameStats.LandClaimSize); // 41
+                    LandClaimSize = GameStats.GetInt(EnumGameStats.LandClaimSize); // 41 is the default, for example
                     LandClaimRadiusMin = LandClaimSize % 2 == 1 ? (LandClaimSize - 1) / 2 : LandClaimSize / 2;
                     LandClaimRadiusMax = (float)Math.Sqrt(Math.Pow(LandClaimRadiusMin, 2) * 2) + 1;
                     _log.Debug($"LandClaimSize: {LandClaimSize}, LandClaimRadiusMin: {LandClaimRadiusMin}, LandClaimRadiusMax: {LandClaimRadiusMax}");
@@ -51,7 +51,11 @@ namespace RaidHours
         {
             try
             {
-                if (IsServer)
+                _log.Trace($"OnPlayerSpawnedInWorld: ({IsServer} && ({_respawnType}))");
+                if (IsServer && (
+                    _respawnType == RespawnType.JoinMultiplayer ||
+                    _respawnType == RespawnType.EnterMultiplayer ||
+                    _respawnType == RespawnType.LoadedGame))
                 {
                     _log.Trace("OnPlayerSpawnedInWorld");
                     ScheduleManager.OnPlayerSpawnedInWorld(_clientInfo);

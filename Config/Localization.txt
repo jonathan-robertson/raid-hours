@@ -1,11 +1,13 @@
 ﻿Key,File,Type,english
 
-stateBuildModeName,buffs,Buff,Build Mode
-stateBuildModeTooltip,buffs,Buff,"[00FF80]Build Mode Active: Claimed Land Cannot Be Damaged By Hostile Players"
+raidHoursBuildModeName,buffs,Buff,Build Mode
+raidHoursBuildModeTooltip,buffs,Buff,"[00FF80]Build Mode Active: Claimed Land Cannot Be Damaged By Hostile Players"
+raidHoursRaidModeName,buffs,Buff,Raid Mode
+raidHoursRaidModeTooltip,buffs,Buff,"[FF007F]Raid Mode Active: Claimed Land Can Now Be Damaged By Hostile Players"
 
-stateRaidModeName,buffs,Buff,Raid Mode
-stateRaidModeTooltip,buffs,Buff,"[FF007F]Raid Mode Active: Claimed Land Can Now Be Damaged By Hostile Players"
+raidHoursModeDesc,buffs,Buff,"We support dynamic LCB Defense values that change based on a real-world schedule; real people have real lives.\n\n- [00FF80]Build Mode: 11pm - 7pm\n    - LCB Defense set to Infinity (online and offline)[-]\n- [FF007F]Raid Mode: 7pm - 11pm\n    - LCB Defense set to {cvar(raidHoursDefaultDefenseOnline:0)}x online and {cvar(raidHoursDefaultDefenseOffline:0)}x offline[-]\n\nNote: all times listed are in the central time zone"
 
-antiZombieRaidProtectionTooltip,buffs,Buff,"[00FF80]Build Mode is still Active[-] - [FF8000]Land claimed by non-allies cannot be approached until raid mode activates"
+raidProtectionName,buffs,Buff,"Raid Protection"
+raidProtectionDesc,buffs,Buff,"Special protection on your claimed land will prevent non-ally players from approaching by warping them away when in range. Please note that [FF8000]this setting has no effect during Raid Hours[-].\n\nTo turn Raid Protection ON or OFF, simply approach your Land Claim and Activate it with the action key. This will also cause a green border to appear around your lcb, but keep in mind your protection extends vertically forever.\n\n- [[00FF80]ON[-]] means you're protected from zombie raiding during the scheduled Build hours, but your base may be easier to discover as a result.\n\n- [[FF007F]OFF[-]] means you are not protected from zombie raiding even during Build hours! But you might prefer this if you care more about being hidden than being safe once discovered.\n\nWhat you choose to do is ultimately up to you, but [FF8000]we STRONGLY RECOMMEND enabling Raid Protection[-].\n\n{cvar(raidHoursRaidProtection:[00FF80]Raid Protection is currently turned ON[-];[FF007F]WARNING - Raid Protection is currently turned OFF[-]; )} for this territory."
 
-stateModeDesc,buffs,Buff,"We support dynamic LCB Defense values that change based on a real-world schedule.\n\nReal people have real lives and this server respects that.\n\n- [00FF80]Build Mode: 11pm - 7pm\n    - LCB Defense set to Infinity (online and offline)[-]\n- [FF007F]Raid Mode: 7pm - 11pm\n    - LCB Defense set to {cvar(RaidHoursDefaultDefenseOnline:0)}x online and {cvar(RaidHoursDefaultDefenseOffline:0)}x offline[-]\n\nNote: all times listed are in the central time zone"
+raidHoursRaidProtectionWarpTooltip,buffs,Buff,"[00FF80]Build Mode is still Active[-] - [FF8000]Land claimed by non-allies cannot be approached until raid mode activates"
