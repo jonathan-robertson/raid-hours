@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 namespace RaidHours
 {
@@ -11,8 +12,9 @@ namespace RaidHours
     {
         private static readonly ModLog<RaidProtectionManager> _log = new ModLog<RaidProtectionManager>();
 
-        internal static string RaidProtectionName { get; private set; } = "raidHoursRaidProtection";
-        internal static string RaidProtectionWarpName { get; private set; } = "raidHoursRaidProtectionWarp";
+        internal static string ProtectionName { get; private set; } = "raidHoursRaidProtection";
+        internal static string ProtectionWarpName { get; private set; } = "raidHoursRaidProtectionWarp";
+        internal static string LoginProtectionWarpName { get; private set; } = "raidHoursLoginProtectionWarp";
 
         /// <summary>
         /// Eject any player within a non-friendly land claim. Even if raid mode is active, even if this lcb has raid protection disabled, we will still eject becuase (1) this help secure a base if hostiles log out inside the base during raid mode only to log back in during build mode and (2) this prevents players from being trolled with invisible cages during build hours.
@@ -22,10 +24,11 @@ namespace RaidHours
         /// <param name="blockPos">Vector3i position this player is spawning in at.</param>
         internal static void OnPlayerSpawnedInWorld(EntityPlayer player, PlatformUserIdentifierAbs playerId, Vector3i blockPos)
         {
+            _log.Trace($"OnPlayerSpawnedInWorld: {player}, {playerId}, {blockPos}");
             if (TryGetLandClaimOwnerRelationship(playerId, blockPos, out _, out var relationship) &&
                 relationship == Relationship.None)
             {
-                Eject(player);
+                _ = ThreadManager.StartCoroutine(EjectLater(player, 0.5f));
             }
         }
 
@@ -33,18 +36,18 @@ namespace RaidHours
         {
             if (!ModApi.IsServer ||
                 !SettingsManager.RaidProtectionEnabled ||
-                entityAlive.entityType != EntityType.Player ||
-                !TryGetLandClaimOwnerRelationship(GetPlayerIdFromEntityId(entityAlive.entityId), blockPosStandingOn, out var lcbBlockPos, out var relationship))
+                !(entityAlive is EntityPlayer player) ||
+                !TryGetPlayerIdFromEntityId(player.entityId, out var playerId) ||
+                !TryGetLandClaimOwnerRelationship(playerId, blockPosStandingOn, out var lcbBlockPos, out var relationship))
             {
                 return;
             }
 
-            var landClaimActive = IsLandClaimActive(lcbBlockPos, entityAlive.world);
+            var landClaimActive = IsLandClaimActive(lcbBlockPos, player.world);
             if (relationship == Relationship.Self)
             {
-                var player = entityAlive as EntityPlayer;
-                player.Buffs.SetCustomVar(RaidProtectionName, landClaimActive ? +1 : -1);
-                _ = player.Buffs.AddBuff(RaidProtectionName);
+                player.Buffs.SetCustomVar(ProtectionName, landClaimActive ? +1 : -1);
+                _ = player.Buffs.AddBuff(ProtectionName);
                 return;
             }
 
@@ -52,7 +55,8 @@ namespace RaidHours
                 ScheduleManager.CurrentState == GameState.Build &&
                 relationship != Relationship.Ally)
             {
-                Eject(entityAlive as EntityPlayer);
+                _ = player.Buffs.AddBuff(ProtectionWarpName);
+                Eject(player);
                 return;
             }
         }
@@ -74,9 +78,17 @@ namespace RaidHours
             return true;
         }
 
-        private static PlatformUserIdentifierAbs GetPlayerIdFromEntityId(int playerEntityId)
+        private static bool TryGetPlayerIdFromEntityId(int playerEntityId, out PlatformUserIdentifierAbs id)
         {
-            return GameManager.Instance.persistentPlayers.GetPlayerDataFromEntityID(playerEntityId).PlatformUserIdentifier;
+            var playerData = GameManager.Instance.persistentPlayers.GetPlayerDataFromEntityID(playerEntityId);
+            _log.Debug($"playerEntityId: {playerEntityId}, playerData: {playerData}, playerData? {playerData == null}");
+            if (playerData != null)
+            {
+                id = playerData.PlatformUserIdentifier;
+                return true;
+            }
+            id = null;
+            return false;
         }
 
         private static bool IsLandClaimActive(Vector3i lcbBlockPos, World world)
@@ -107,8 +119,17 @@ namespace RaidHours
                 && landClaimPos.z - ModApi.LandClaimRadiusMin - 1 <= blockPos.z && blockPos.z <= landClaimPos.z + ModApi.LandClaimRadiusMin + 1;
         }
 
+        private static IEnumerator EjectLater(EntityPlayer player, float delay)
+        {
+            _log.Info($"EjectLater: {player}, delayed for {delay}s");
+            yield return new WaitForSeconds(delay);
+            _ = player.Buffs.AddBuff(LoginProtectionWarpName);
+            Eject(player);
+        }
+
         private static void Eject(EntityPlayer player)
         {
+            _log.Info($"Ejecting {player}");
             if (player.IsSpectator)
             {
                 return; // allow admins to access any land claim at any time... invisibly!
@@ -124,15 +145,12 @@ namespace RaidHours
             }
             vector.y = player.world.GetHeight((int)vector.x, (int)vector.z) + 1;
 
-            _ = player.Buffs.AddBuff(RaidProtectionWarpName);
-
-            // TODO: also facing player away from LCB... could this be ideal? not possible with remote vehicles
-
             Warp(player, vector);
         }
 
         private static void Warp(EntityPlayer player, Vector3 destination)
         {
+            _log.Info($"Warp {player} to {destination}");
             if (player.isEntityRemote)
             {
                 SingletonMonoBehaviour<ConnectionManager>.Instance.Clients.ForEntityId(player.entityId).SendPackage(NetPackageManager.GetPackage<NetPackageTeleportPlayer>().Setup(destination, null, false));

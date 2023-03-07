@@ -52,15 +52,14 @@ namespace RaidHours
             try
             {
                 _log.Trace($"OnPlayerSpawnedInWorld: ({IsServer} && ({_respawnType}))");
-                if (IsServer && (
-                    _respawnType == RespawnType.JoinMultiplayer || // remote player returns
-                    _respawnType == RespawnType.EnterMultiplayer || // remote player joins for the first time
-                    _respawnType == RespawnType.LoadedGame)) // local player/host just loaded the game
+                if (IsServer && (_respawnType == RespawnType.JoinMultiplayer  // remote player returns
+                    || _respawnType == RespawnType.EnterMultiplayer  // remote player joins for the first time
+                    || _respawnType == RespawnType.LoadedGame)) // local player/host just loaded the game
                 {
                     var entityId = SafelyGetEntityIdFor(_clientInfo);
                     if (!GameManager.Instance.World.Players.dict.TryGetValue(entityId, out var player))
                     {
-                        _log.Warn($"Player could not be found with entityId of {entityId}. This is not expected.");
+                        _log.Trace($"Player could not be found with entityId of {entityId}. This is not expected.");
                         return;
                     }
 

@@ -94,7 +94,7 @@ namespace RaidHours
             if (players.Length == 0)
             {
                 var playerList = GameManager.Instance.World.Players.list;
-                ConnectionManager.Instance.SendPackage(netPackage); // TODO: confirm this sends to all connected clients and local players
+                ConnectionManager.Instance.SendPackage(netPackage);
                 for (var i = 0; i < playerList.Count; i++)
                 {
                     _ = playerList[i].Buffs.AddBuff(buff);

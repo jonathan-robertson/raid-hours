@@ -13,8 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - finish teaser video
 - update build/raid text to reflect start/end times and timezone reference... perhaps +06:00 reference since these use numbers (cvar-supported)? :)
 
-## [0.2.0] - 2023-03-05
+## [TODO]
 
+- add journal entries explaining features
+
+## [0.2.0] - 2023-03-06
+
+- add new toolbelt tip when removed on login
 - warp players out of claimed land on login
 
 ## [0.1.0] - 2023-03-05
