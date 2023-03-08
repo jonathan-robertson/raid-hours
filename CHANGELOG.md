@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - add journal entries explaining features
 
+## [0.2.1] - 2023-03-09
+
+- fix lcb id check on login
+
 ## [0.2.0] - 2023-03-06
 
 - add new toolbelt tip when removed on login

@@ -25,8 +25,8 @@ namespace RaidHours
         internal static void OnPlayerSpawnedInWorld(EntityPlayer player, PlatformUserIdentifierAbs playerId, Vector3i blockPos)
         {
             _log.Trace($"OnPlayerSpawnedInWorld: {player}, {playerId}, {blockPos}");
-            if (TryGetLandClaimOwnerRelationship(playerId, blockPos, out _, out var relationship) &&
-                relationship == Relationship.None)
+            if (TryGetLandClaimOwnerRelationship(playerId, blockPos, out _, out var relationship)
+                && relationship == Relationship.None)
             {
                 _ = ThreadManager.StartCoroutine(EjectLater(player, 0.5f));
             }

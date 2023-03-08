@@ -100,7 +100,7 @@ namespace RaidHours
         {
             return clientInfo == null
                 ? GameManager.Instance.persistentLocalPlayer.PlatformUserIdentifier
-                : clientInfo.InternalId;
+                : clientInfo.PlatformId;
         }
     }
 }
