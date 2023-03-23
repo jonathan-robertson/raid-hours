@@ -25,7 +25,8 @@ namespace RaidHours
         internal static void OnPlayerSpawnedInWorld(EntityPlayer player, PlatformUserIdentifierAbs playerId, Vector3i blockPos)
         {
             _log.Trace($"OnPlayerSpawnedInWorld: {player}, {playerId}, {blockPos}");
-            if (TryGetLandClaimOwnerRelationship(playerId, blockPos, out _, out var relationship)
+            if (!player.IsSpectator
+                && TryGetLandClaimOwnerRelationship(playerId, blockPos, out _, out var relationship)
                 && relationship == Relationship.None)
             {
                 _ = ThreadManager.StartCoroutine(EjectLater(player, 0.5f));
@@ -37,6 +38,7 @@ namespace RaidHours
             if (!ModApi.IsServer
                 || !SettingsManager.RaidProtectionEnabled
                 || !(entityAlive is EntityPlayer player)
+                || !player.IsSpectator
                 || !TryGetPlayerIdFromEntityId(player.entityId, out var playerId)
                 || !TryGetLandClaimOwnerRelationship(playerId, blockPosStandingOn, out var lcbBlockPos, out var relationship))
             {
