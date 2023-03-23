@@ -52,9 +52,10 @@ namespace RaidHours
             try
             {
                 _log.Trace($"OnPlayerSpawnedInWorld: ({IsServer} && ({_respawnType}))");
-                if (IsServer && (_respawnType == RespawnType.JoinMultiplayer  // remote player returns
-                    || _respawnType == RespawnType.EnterMultiplayer  // remote player joins for the first time
-                    || _respawnType == RespawnType.LoadedGame)) // local player/host just loaded the game
+                if (IsServer
+                    && (_respawnType == RespawnType.JoinMultiplayer  // remote player returns
+                        || _respawnType == RespawnType.EnterMultiplayer  // remote player joins for the first time
+                        || _respawnType == RespawnType.LoadedGame)) // local player/host just loaded the game
                 {
                     var entityId = SafelyGetEntityIdFor(_clientInfo);
                     if (!GameManager.Instance.World.Players.dict.TryGetValue(entityId, out var player))
@@ -64,7 +65,10 @@ namespace RaidHours
                     }
 
                     ScheduleManager.OnPlayerSpawnedInWorld(player);
-                    RaidProtectionManager.OnPlayerSpawnedInWorld(player, SafelyGetPlatformIdFor(_clientInfo), _pos);
+                    if (TryGetUserIdFor(_clientInfo, out var userId))
+                    {
+                        RaidProtectionManager.OnPlayerSpawnedInWorld(player, userId, _pos);
+                    }
                 }
             }
             catch (Exception e)
@@ -91,16 +95,17 @@ namespace RaidHours
 
         private static int SafelyGetEntityIdFor(ClientInfo clientInfo)
         {
-            return clientInfo == null
-                ? GameManager.Instance.persistentLocalPlayer.EntityId
-                : clientInfo.entityId;
+            return clientInfo != null
+                ? clientInfo.entityId
+                : GameManager.Instance.persistentLocalPlayer.EntityId;
         }
 
-        private static PlatformUserIdentifierAbs SafelyGetPlatformIdFor(ClientInfo clientInfo)
+        private static bool TryGetUserIdFor(ClientInfo clientInfo, out PlatformUserIdentifierAbs userId)
         {
-            return clientInfo == null
-                ? GameManager.Instance.persistentLocalPlayer.PlatformUserIdentifier
-                : clientInfo.PlatformId;
+            userId = clientInfo != null
+                ? GameManager.Instance.persistentPlayers.GetPlayerDataFromEntityID(clientInfo.entityId)?.UserIdentifier
+                : GameManager.Instance.persistentLocalPlayer.UserIdentifier;
+            return userId != null;
         }
     }
 }
