@@ -34,11 +34,11 @@ namespace RaidHours
 
         internal static void OnEntityBlockPositionChanged(EntityAlive entityAlive, Vector3i blockPosStandingOn)
         {
-            if (!ModApi.IsServer ||
-                !SettingsManager.RaidProtectionEnabled ||
-                !(entityAlive is EntityPlayer player) ||
-                !TryGetPlayerIdFromEntityId(player.entityId, out var playerId) ||
-                !TryGetLandClaimOwnerRelationship(playerId, blockPosStandingOn, out var lcbBlockPos, out var relationship))
+            if (!ModApi.IsServer
+                || !SettingsManager.RaidProtectionEnabled
+                || !(entityAlive is EntityPlayer player)
+                || !TryGetPlayerIdFromEntityId(player.entityId, out var playerId)
+                || !TryGetLandClaimOwnerRelationship(playerId, blockPosStandingOn, out var lcbBlockPos, out var relationship))
             {
                 return;
             }
@@ -51,9 +51,9 @@ namespace RaidHours
                 return;
             }
 
-            if (landClaimActive &&
-                ScheduleManager.CurrentState == GameState.Build &&
-                relationship != Relationship.Ally)
+            if (landClaimActive
+                && ScheduleManager.CurrentState == GameState.Build
+                && relationship != Relationship.Ally)
             {
                 _ = player.Buffs.AddBuff(ProtectionWarpName);
                 Eject(player);
@@ -70,21 +70,25 @@ namespace RaidHours
                 return false;
             }
 
-            relationship = PlatformUserIdentifierAbs.Equals(landClaimOwner.PlatformUserIdentifier, playerId)
-                ? Relationship.Self
-                : landClaimOwner.ACL != null && landClaimOwner.ACL.Contains(playerId)
-                    ? Relationship.Ally
+            relationship = PlatformUserIdentifierAbs.Equals(landClaimOwner.UserIdentifier, playerId)
+                ? Relationship.Self // success
+                : AreAllies(landClaimOwner, playerId)
+                    ? Relationship.Ally // success
                     : Relationship.None;
             return true;
+        }
+
+        private static bool AreAllies(PersistentPlayerData ppData, PlatformUserIdentifierAbs otherPlayer)
+        {
+            return ppData.ACL != null && ppData.ACL.Contains(otherPlayer);
         }
 
         private static bool TryGetPlayerIdFromEntityId(int playerEntityId, out PlatformUserIdentifierAbs id)
         {
             var playerData = GameManager.Instance.persistentPlayers.GetPlayerDataFromEntityID(playerEntityId);
-            _log.Debug($"playerEntityId: {playerEntityId}, playerData: {playerData}, playerData? {playerData == null}");
             if (playerData != null)
             {
-                id = playerData.PlatformUserIdentifier;
+                id = playerData.UserIdentifier;
                 return true;
             }
             id = null;
@@ -115,8 +119,10 @@ namespace RaidHours
 
         private static bool IsWithinLandClaimAtBlockPos(Vector3i blockPos, Vector3i landClaimPos)
         {
-            return landClaimPos.x - ModApi.LandClaimRadiusMin - 1 <= blockPos.x && blockPos.x <= landClaimPos.x + ModApi.LandClaimRadiusMin + 1
-                && landClaimPos.z - ModApi.LandClaimRadiusMin - 1 <= blockPos.z && blockPos.z <= landClaimPos.z + ModApi.LandClaimRadiusMin + 1;
+            return landClaimPos.x - ModApi.LandClaimRadiusMin - 1 <= blockPos.x
+                    && blockPos.x <= landClaimPos.x + ModApi.LandClaimRadiusMin + 1
+                && landClaimPos.z - ModApi.LandClaimRadiusMin - 1 <= blockPos.z
+                    && blockPos.z <= landClaimPos.z + ModApi.LandClaimRadiusMin + 1;
         }
 
         private static IEnumerator EjectLater(EntityPlayer player, float delay)
@@ -130,11 +136,6 @@ namespace RaidHours
         private static void Eject(EntityPlayer player)
         {
             _log.Info($"Ejecting {player}");
-            if (player.IsSpectator)
-            {
-                return; // allow admins to access any land claim at any time... invisibly!
-            }
-
             var rand = player.world.GetGameRandom();
             var normalized = new Vector3(0.5f - rand.RandomFloat, 0f, 0.5f - rand.RandomFloat).normalized;
             var vector = player.position + (normalized * 5f);
