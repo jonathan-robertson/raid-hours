@@ -73,9 +73,9 @@ namespace RaidHours
             }
 
             relationship = PlatformUserIdentifierAbs.Equals(landClaimOwner.UserIdentifier, playerId)
-                ? Relationship.Self // success
+                ? Relationship.Self
                 : AreAllies(landClaimOwner, playerId)
-                    ? Relationship.Ally // success
+                    ? Relationship.Ally
                     : Relationship.None;
             return true;
         }
