@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - fix issue where raid protection would not work
   - logic mistake when checking isSpectator
+- update admin console help text for `rh` command
 
 ## [0.2.2] - 2023-03-23
 
