@@ -17,7 +17,7 @@ namespace RaidHours
             // tip - windows and linux typically use a different set of standards when it comes to timezones.
             // one example is how CST is handled... windows: "Central Standard Time", linux: "America/Chicago"
             var dict = new Dictionary<string, string>() {
-                { "", "show players and their amnesia-related info" },
+                { "", "show raid-hours mod settings" },
                 { "debug", "toggle debug logging mode" },
                 { "list", "list available timezones for your operating system" },
                 { "set timezone <string>", "set the timezone; use 'list' to get a list of timezones your operating system supports" },
