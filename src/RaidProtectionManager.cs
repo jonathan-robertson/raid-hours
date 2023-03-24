@@ -37,8 +37,7 @@ namespace RaidHours
         {
             if (!ModApi.IsServer
                 || !SettingsManager.RaidProtectionEnabled
-                || !(entityAlive is EntityPlayer player)
-                || !player.IsSpectator
+                || !(entityAlive is EntityPlayer player) || player.IsSpectator
                 || !TryGetPlayerIdFromEntityId(player.entityId, out var playerId)
                 || !TryGetLandClaimOwnerRelationship(playerId, blockPosStandingOn, out var lcbBlockPos, out var relationship))
             {
