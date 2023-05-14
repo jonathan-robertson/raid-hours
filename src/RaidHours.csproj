@@ -63,7 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConsoleCmdRaidHours.cs" />
-    <Compile Include="EntityAlive_Patches.cs" />
+    <Compile Include="Patches.cs" />
     <Compile Include="ModApi.cs" />
     <Compile Include="ModLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
