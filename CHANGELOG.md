@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.0] - UNRELEASED
 
+- add color to journal entry
 - remove raid protection feature
 
 ## [0.2.4] - 2023-05-14
