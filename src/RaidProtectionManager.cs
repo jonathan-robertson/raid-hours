@@ -12,8 +12,6 @@ namespace RaidHours
     {
         private static readonly ModLog<RaidProtectionManager> _log = new ModLog<RaidProtectionManager>();
 
-        internal static string ProtectionName { get; private set; } = "raidHoursRaidProtection";
-        internal static string ProtectionWarpName { get; private set; } = "raidHoursRaidProtectionWarp";
         internal static string LoginProtectionWarpName { get; private set; } = "raidHoursLoginProtectionWarp";
 
         /// <summary>
@@ -30,35 +28,6 @@ namespace RaidHours
                 && relationship == Relationship.None)
             {
                 _ = ThreadManager.StartCoroutine(EjectLater(player, 0.5f));
-            }
-        }
-
-        internal static void OnEntityBlockPositionChanged(EntityAlive entityAlive, Vector3i blockPosStandingOn)
-        {
-            if (!ModApi.IsServer
-                || !SettingsManager.RaidProtectionEnabled
-                || !(entityAlive is EntityPlayer player) || player.IsSpectator
-                || !TryGetPlayerIdFromEntityId(player.entityId, out var playerId)
-                || !TryGetLandClaimOwnerRelationship(playerId, blockPosStandingOn, out var lcbBlockPos, out var relationship))
-            {
-                return;
-            }
-
-            var landClaimActive = IsLandClaimActive(lcbBlockPos, player.world);
-            if (relationship == Relationship.Self)
-            {
-                player.Buffs.SetCustomVar(ProtectionName, landClaimActive ? +1 : -1);
-                _ = player.Buffs.AddBuff(ProtectionName);
-                return;
-            }
-
-            if (landClaimActive
-                && ScheduleManager.CurrentState == GameState.Build
-                && relationship != Relationship.Ally)
-            {
-                _ = player.Buffs.AddBuff(ProtectionWarpName);
-                Eject(player);
-                return;
             }
         }
 
@@ -82,24 +51,6 @@ namespace RaidHours
         private static bool AreAllies(PersistentPlayerData ppData, PlatformUserIdentifierAbs otherPlayer)
         {
             return ppData.ACL != null && ppData.ACL.Contains(otherPlayer);
-        }
-
-        private static bool TryGetPlayerIdFromEntityId(int playerEntityId, out PlatformUserIdentifierAbs id)
-        {
-            var playerData = GameManager.Instance.persistentPlayers.GetPlayerDataFromEntityID(playerEntityId);
-            if (playerData != null)
-            {
-                id = playerData.UserIdentifier;
-                return true;
-            }
-            id = null;
-            return false;
-        }
-
-        private static bool IsLandClaimActive(Vector3i lcbBlockPos, World world)
-        {
-            var chunkId = world.ChunkCache.ClusterIdx;
-            return world.GetTileEntity(chunkId, lcbBlockPos) is TileEntityLandClaim tileEntityLandClaim && tileEntityLandClaim.ShowBounds;
         }
 
         private static bool TryGetLandClaimContaining(Vector3i blockPos, out Vector3i landClaimBlockPos, out PersistentPlayerData landClaimOwner)

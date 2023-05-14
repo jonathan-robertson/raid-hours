@@ -23,7 +23,6 @@ namespace RaidHours
                 { "fix <user id / player name / entity id>", "fix player's raid hours state; if player is unable to damage claimed land during raid hours, this will re-send the correct raid mode values to the given player" },
                 { "set timezone <string>", "set the timezone; use 'list' to get a list of timezones your operating system supports" },
                 { "set <start/stop> [d=Monday/Tuesday/...] [h=value] [m=value]", "update the start or stop time with the provided rule... d (day of week), (h hour of day), and m (minute of hour) can all be omitted, but m will default to 0 (i.e. top of the hour). NOTE: h is in 24-hr time, so 17 = 5pm." },
-                { "set rp <enable/disable>", "enable or disable the option to protect against zombie/opportunistic raiding during build time by warping non-allies away (think: trader areas but for LCBs)" },
             };
 
             var i = 1; var j = 1;
@@ -119,22 +118,6 @@ namespace RaidHours
                                         SdtdConsole.Instance.Output($"No change to Raid Stop Time was made because the provided input matches its current configuration.");
                                     }
                                     return;
-                                }
-                                break;
-                            case "rp":
-                                if (_params.Count == 3)
-                                {
-                                    switch (_params[2].ToLower())
-                                    {
-                                        case "enable":
-                                            _ = SettingsManager.SetRaidProtectionEnabled(true);
-                                            SdtdConsole.Instance.Output($"Enabled Raid Protection.");
-                                            return;
-                                        case "disable":
-                                            _ = SettingsManager.SetRaidProtectionEnabled(false);
-                                            SdtdConsole.Instance.Output($"Disabled Raid Protection.");
-                                            return;
-                                    }
                                 }
                                 break;
                         }
