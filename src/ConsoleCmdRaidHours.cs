@@ -150,7 +150,7 @@ namespace RaidHours
 
         private bool TryGetPlayerFromIdentifier(string identifier, out EntityPlayer entityPlayer)
         {
-            ClientInfo clientInfo2 = ConsoleHelper.ParseParamIdOrName(identifier, true, false);
+            var clientInfo2 = ConsoleHelper.ParseParamIdOrName(identifier, true, false);
             if (clientInfo2 == null)
             {
                 if (GameManager.IsDedicatedServer || !ConsoleHelper.ParamIsLocalPlayer(identifier, true, false))
@@ -162,7 +162,8 @@ namespace RaidHours
                 entityPlayer = GameManager.Instance.World.GetPrimaryPlayer();
                 return true;
             }
-            if (!GameManager.Instance.World.Players.dict.TryGetValue(clientInfo2.entityId, out entityPlayer)) {
+            if (!GameManager.Instance.World.Players.dict.TryGetValue(clientInfo2.entityId, out entityPlayer))
+            {
                 SdtdConsole.Instance.Output("Target playername or entity/userid id not found.");
                 return false;
             }
