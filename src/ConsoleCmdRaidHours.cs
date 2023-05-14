@@ -20,6 +20,7 @@ namespace RaidHours
                 { "", "show raid-hours mod settings" },
                 { "debug", "toggle debug logging mode" },
                 { "list", "list available timezones for your operating system" },
+                { "fix <user id / player name / entity id>", "fix player's raid hours state; if player is unable to damage claimed land during raid hours, this will re-send the correct raid mode values to the given player" },
                 { "set timezone <string>", "set the timezone; use 'list' to get a list of timezones your operating system supports" },
                 { "set <start/stop> [d=Monday/Tuesday/...] [h=value] [m=value]", "update the start or stop time with the provided rule... d (day of week), (h hour of day), and m (minute of hour) can all be omitted, but m will default to 0 (i.e. top of the hour). NOTE: h is in 24-hr time, so 17 = 5pm." },
                 { "set rp <enable/disable>", "enable or disable the option to protect against zombie/opportunistic raiding during build time by warping non-allies away (think: trader areas but for LCBs)" },
@@ -65,6 +66,12 @@ namespace RaidHours
                     case "debug":
                         ModApi.DebugMode = !ModApi.DebugMode;
                         SdtdConsole.Instance.Output($"Debug Mode has successfully been {(ModApi.DebugMode ? "enabled" : "disabled")}.");
+                        return;
+                    case "fix":
+                        if (_params.Count != 2) { break; }
+                        if (!TryGetPlayerFromIdentifier(_params[1], out var player)) { return; }
+                        ScheduleManager.OnPlayerSpawnedInWorld(player);
+                        SdtdConsole.Instance.Output($"Current raid state has been re-sent to player {player.GetDebugName()}.");
                         return;
                     case "set":
                         if (_params.Count == 1) { break; }
@@ -139,6 +146,27 @@ namespace RaidHours
             {
                 SdtdConsole.Instance.Output($"Exception encountered: \"{e.Message}\"\n{e.StackTrace}");
             }
+        }
+
+        private bool TryGetPlayerFromIdentifier(string identifier, out EntityPlayer entityPlayer)
+        {
+            ClientInfo clientInfo2 = ConsoleHelper.ParseParamIdOrName(identifier, true, false);
+            if (clientInfo2 == null)
+            {
+                if (GameManager.IsDedicatedServer || !ConsoleHelper.ParamIsLocalPlayer(identifier, true, false))
+                {
+                    SdtdConsole.Instance.Output("Target playername or entity/userid id not found.");
+                    entityPlayer = default;
+                    return false;
+                }
+                entityPlayer = GameManager.Instance.World.GetPrimaryPlayer();
+                return true;
+            }
+            if (!GameManager.Instance.World.Players.dict.TryGetValue(clientInfo2.entityId, out entityPlayer)) {
+                SdtdConsole.Instance.Output("Target playername or entity/userid id not found.");
+                return false;
+            }
+            return true;
         }
 
         private bool TryParseTimeTrigger(List<string> _params, out TimeTrigger timeTrigger)
