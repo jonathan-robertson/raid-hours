@@ -11,6 +11,7 @@ namespace RaidHours
         internal static int LandClaimSize { get; private set; }
         internal static int LandClaimRadiusMin { get; private set; }
         internal static float LandClaimRadiusMax { get; private set; }
+        public static int LandClaimExpiryHours { get; private set; }
 
         internal static bool IsServer { get; private set; }
 
@@ -37,7 +38,8 @@ namespace RaidHours
                     LandClaimSize = GameStats.GetInt(EnumGameStats.LandClaimSize); // 41 is the default, for example
                     LandClaimRadiusMin = LandClaimSize % 2 == 1 ? (LandClaimSize - 1) / 2 : LandClaimSize / 2;
                     LandClaimRadiusMax = (float)Math.Sqrt(Math.Pow(LandClaimRadiusMin, 2) * 2) + 1;
-                    _log.Debug($"LandClaimSize: {LandClaimSize}, LandClaimRadiusMin: {LandClaimRadiusMin}, LandClaimRadiusMax: {LandClaimRadiusMax}");
+                    LandClaimExpiryHours = GameStats.GetInt(EnumGameStats.LandClaimExpiryTime) * 24;
+                    _log.Debug($"LandClaimSize: {LandClaimSize}, LandClaimRadiusMin: {LandClaimRadiusMin}, LandClaimRadiusMax: {LandClaimRadiusMax}, LandClaimExpiryHours: {LandClaimExpiryHours}");
                     ScheduleManager.OnGameStartDone();
                 }
             }
@@ -67,7 +69,7 @@ namespace RaidHours
                     ScheduleManager.OnPlayerSpawnedInWorld(player);
                     if (TryGetUserIdFor(_clientInfo, out var userId))
                     {
-                        RaidProtectionManager.OnPlayerSpawnedInWorld(player, userId, _pos);
+                        EjectionManager.OnPlayerSpawnedInWorld(player, userId, _pos);
                     }
                 }
             }
@@ -106,6 +108,18 @@ namespace RaidHours
                 ? GameManager.Instance.persistentPlayers.GetPlayerDataFromEntityID(clientInfo.entityId)?.UserIdentifier
                 : GameManager.Instance.persistentLocalPlayer.UserIdentifier;
             return userId != null;
+        }
+
+        internal static bool TryGetPlayerIdFromEntityId(int playerEntityId, out PlatformUserIdentifierAbs id)
+        {
+            var playerData = GameManager.Instance.persistentPlayers.GetPlayerDataFromEntityID(playerEntityId);
+            if (playerData != null)
+            {
+                id = playerData.UserIdentifier;
+                return true;
+            }
+            id = null;
+            return false;
         }
     }
 }

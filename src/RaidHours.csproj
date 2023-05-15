@@ -65,8 +65,9 @@
     <Compile Include="ConsoleCmdRaidHours.cs" />
     <Compile Include="ModApi.cs" />
     <Compile Include="ModLog.cs" />
+    <Compile Include="Patches.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RaidProtectionManager.cs" />
+    <Compile Include="EjectionManager.cs" />
     <Compile Include="SettingsManager.cs" />
     <Compile Include="ScheduleManager.cs" />
     <Compile Include="TimeTrigger.cs" />

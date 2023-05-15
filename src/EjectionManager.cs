@@ -8,9 +8,9 @@ namespace RaidHours
         None, Ally, Self
     }
 
-    internal class RaidProtectionManager
+    internal class EjectionManager
     {
-        private static readonly ModLog<RaidProtectionManager> _log = new ModLog<RaidProtectionManager>();
+        private static readonly ModLog<EjectionManager> _log = new ModLog<EjectionManager>();
 
         internal static string LoginProtectionWarpName { get; private set; } = "raidHoursLoginProtectionWarp";
 
@@ -31,21 +31,73 @@ namespace RaidHours
             }
         }
 
+        /// <summary>
+        /// Handle block damage at the given position and return whether it should be nullified.
+        /// </summary>
+        /// <param name="world">WorldBase used for fetching/filtering through world entities.</param>
+        /// <param name="blockPos">Vector3i of the block that was hit.</param>
+        /// <param name="entityIdThatDamaged">entityId of the entity that hit the block at the provided position.</param>
+        /// <returns>Whether the block's damage should be nullified.</returns>
+        internal static bool OnDamageBlock(WorldBase world, Vector3i blockPos, int entityIdThatDamaged)
+        {
+            _log.Trace($"OnDamageBlock: {blockPos}, {entityIdThatDamaged}");
+            if (IsZombieOrAnimal(world, entityIdThatDamaged)
+                && TryGetActiveLandClaimContaining(blockPos, out var landClaimPos, out var landClaimOwner)
+                && !IsLandClaimOccupiedByOwnerOrAllies(world, landClaimPos, landClaimOwner))
+            {
+                _log.Trace($"damage from {entityIdThatDamaged} was prevented");
+                _ = world.RemoveEntity(entityIdThatDamaged, EnumRemoveEntityReason.Despawned);
+                EjectPlayersFromClaimedLand(world, landClaimPos);
+                return true;
+            }
+            return false;
+        }
+
+        private static bool IsZombieOrAnimal(WorldBase world, int entityId)
+        {
+            _log.Trace($"IsZombieOrAnimal: {entityId}");
+            var entity = world.GetEntity(entityId);
+            return entity != null
+                && (entity.entityType == EntityType.Zombie || entity.entityType == EntityType.Animal);
+        }
+
         private static bool TryGetLandClaimOwnerRelationship(PlatformUserIdentifierAbs playerId, Vector3i playerBlockPos, out Vector3i landClaimBlockPos, out Relationship relationship)
         {
-            if (!TryGetLandClaimContaining(playerBlockPos, out landClaimBlockPos, out var landClaimOwner))
+            _log.Trace($"TryGetLandClaimOwnerRelationship: {playerId}, {playerBlockPos}");
+            if (!TryGetActiveLandClaimContaining(playerBlockPos, out landClaimBlockPos, out var landClaimOwner))
             {
                 landClaimBlockPos = Vector3i.zero;
                 relationship = Relationship.None;
                 return false;
             }
 
-            relationship = PlatformUserIdentifierAbs.Equals(landClaimOwner.UserIdentifier, playerId)
+            relationship = GetRelationship(landClaimOwner, playerId);
+            return true;
+        }
+
+        private static bool IsLandClaimOccupiedByOwnerOrAllies(WorldBase world, Vector3i landClaimPos, PersistentPlayerData owner)
+        {
+            _log.Trace($"IsLandClaimOccupiedByOwnerOrAllies: {landClaimPos}, {owner.PlayerName}");
+            var players = world.GetPlayers();
+            for (var i = 0; i < players.Count; i++)
+            {
+                if (ModApi.TryGetPlayerIdFromEntityId(players[i].entityId, out var playerId)
+                    && GetRelationship(owner, playerId) != Relationship.None
+                    && IsWithinLandClaimAtBlockPos(players[i].GetBlockPosition(), landClaimPos))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static Relationship GetRelationship(PersistentPlayerData ppData, PlatformUserIdentifierAbs otherPlayerId)
+        {
+            return PlatformUserIdentifierAbs.Equals(ppData.UserIdentifier, otherPlayerId)
                 ? Relationship.Self
-                : AreAllies(landClaimOwner, playerId)
+                : AreAllies(ppData, otherPlayerId)
                     ? Relationship.Ally
                     : Relationship.None;
-            return true;
         }
 
         private static bool AreAllies(PersistentPlayerData ppData, PlatformUserIdentifierAbs otherPlayer)
@@ -53,11 +105,13 @@ namespace RaidHours
             return ppData.ACL != null && ppData.ACL.Contains(otherPlayer);
         }
 
-        private static bool TryGetLandClaimContaining(Vector3i blockPos, out Vector3i landClaimBlockPos, out PersistentPlayerData landClaimOwner)
+        private static bool TryGetActiveLandClaimContaining(Vector3i blockPos, out Vector3i landClaimBlockPos, out PersistentPlayerData landClaimOwner)
         {
+            _log.Trace($"TryGetActiveLandClaimContaining {blockPos}");
             foreach (var kvp in GameManager.Instance.persistentPlayers.m_lpBlockMap)
             {
-                if (IsWithinLandClaimAtBlockPos(blockPos, kvp.Key))
+                if (ModApi.LandClaimExpiryHours > kvp.Value.OfflineHours // player's land claim must not be expired
+                    && IsWithinLandClaimAtBlockPos(blockPos, kvp.Key))
                 {
                     landClaimBlockPos = kvp.Key;
                     landClaimOwner = kvp.Value;
@@ -79,7 +133,7 @@ namespace RaidHours
 
         private static IEnumerator EjectLater(EntityPlayer player, float delay)
         {
-            _log.Info($"EjectLater: {player}, delayed for {delay}s");
+            _log.Trace($"EjectLater: {player}, delayed for {delay}s");
             yield return new WaitForSeconds(delay);
             _ = player.Buffs.AddBuff(LoginProtectionWarpName);
             Eject(player);
@@ -87,12 +141,12 @@ namespace RaidHours
 
         private static void Eject(EntityPlayer player)
         {
-            _log.Info($"Ejecting {player}");
+            _log.Trace($"Ejecting {player.entityId}");
             var rand = player.world.GetGameRandom();
             var normalized = new Vector3(0.5f - rand.RandomFloat, 0f, 0.5f - rand.RandomFloat).normalized;
             var vector = player.position + (normalized * 5f);
             var num = 20;
-            while (TryGetLandClaimContaining(new Vector3i(vector), out var _, out var _) && --num > 0)
+            while (TryGetActiveLandClaimContaining(new Vector3i(vector), out var _, out var _) && --num > 0)
             {
                 vector += normalized * 5f;
             }
@@ -101,9 +155,24 @@ namespace RaidHours
             Warp(player, vector);
         }
 
+        private static void EjectPlayersFromClaimedLand(WorldBase world, Vector3i landClaimPos)
+        {
+            _log.Trace($"EjectPlayersFromClaimedLand at {landClaimPos}");
+            EntityPlayer player;
+            for (var i = 0; i < world.GetPlayers().Count; i++)
+            {
+                player = world.GetPlayers()[i];
+                if (!player.IsSpectator
+                    && IsWithinLandClaimAtBlockPos(player.GetBlockPosition(), landClaimPos))
+                {
+                    Eject(player);
+                }
+            }
+        }
+
         private static void Warp(EntityPlayer player, Vector3 destination)
         {
-            _log.Info($"Warp {player} to {destination}");
+            _log.Trace($"Warp {player} to {destination}");
             if (player.isEntityRemote)
             {
                 SingletonMonoBehaviour<ConnectionManager>.Instance.Clients.ForEntityId(player.entityId).SendPackage(NetPackageManager.GetPackage<NetPackageTeleportPlayer>().Setup(destination, null, false));
