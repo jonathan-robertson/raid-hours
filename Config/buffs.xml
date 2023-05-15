@@ -31,6 +31,27 @@
             </effect_group>
         </buff>
 
+
+        <buff name="raidHoursMobRaidingProtectionWarp" hidden="true">
+            <duration value="2" />
+            <stack_type value="effect" />
+            <effect_group>
+                <passive_effect name="BuffBlink" operation="base_set" value="2" duration="0,3" tags="raidHoursBuildMode" />
+                <passive_effect name="BuffBlink" operation="base_set" value="2" duration="0,3" tags="raidHoursRaidMode" />
+
+                <triggered_effect trigger="onSelfBuffStart" action="ShowToolbeltMessage" message_key="raidHoursMobRaidingProtectionWarpTooltip" />
+                <triggered_effect trigger="onSelfBuffStack" action="ShowToolbeltMessage" message_key="raidHoursMobRaidingProtectionWarpTooltip" />
+
+                <triggered_effect trigger="onSelfBuffStart" action="PlaySound" sound="solarpanel_on" play_in_head="false" />
+                <triggered_effect trigger="onSelfBuffStack" action="PlaySound" sound="solarpanel_on" play_in_head="false" />
+
+                <triggered_effect trigger="onSelfBuffStart" action="AttachParticleEffectToEntity" particle="RadiatedParticlesOnMesh" parent_transform="LOD0" shape_mesh="true" />
+                <triggered_effect trigger="onSelfDied" action="RemoveParticleEffectFromEntity" particle="RadiatedParticlesOnMesh" />
+                <triggered_effect trigger="onSelfBuffFinish" action="RemoveParticleEffectFromEntity" particle="RadiatedParticlesOnMesh" />
+                <triggered_effect trigger="onSelfBuffRemove" action="RemoveParticleEffectFromEntity" particle="RadiatedParticlesOnMesh" />
+                <triggered_effect trigger="onSelfLeaveGame" action="RemoveParticleEffectFromEntity" particle="RadiatedParticlesOnMesh" />
+            </effect_group>
+        </buff>
         <buff name="raidHoursLoginProtectionWarp" hidden="true">
             <duration value="2" />
             <stack_type value="effect" />
