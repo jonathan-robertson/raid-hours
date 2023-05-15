@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.0] - 2023-05-15
 
-- add color to journal entry
+- add color/info to journal entry
 - detect if owners/allies are within land claim
 - ignore expired land claims
 - remove raid protection feature
