@@ -3,21 +3,27 @@ using System;
 
 namespace RaidHours
 {
-    [HarmonyPatch(typeof(EntityAlive), "updateCurrentBlockPosAndValue")]
-    internal class EntityAlive_updateCurrentBlockPosAndValue_Patches
+    [HarmonyPatch(typeof(Block), "DamageBlock")]
+    internal class Block_DamageBlock_Patch
     {
-        private static readonly ModLog<EntityAlive_updateCurrentBlockPosAndValue_Patches> _log = new ModLog<EntityAlive_updateCurrentBlockPosAndValue_Patches>();
+        private static readonly ModLog<Block_DamageBlock_Patch> _log = new ModLog<Block_DamageBlock_Patch>();
 
-        public static void Postfix(EntityAlive __instance, Vector3i ___blockPosStandingOn)
+        public static bool Prefix(WorldBase _world, int _clrIdx, Vector3i _blockPos, BlockValue _blockValue, int _damagePoints, int _entityIdThatDamaged, ref int __result)
         {
             try
             {
-                RaidProtectionManager.OnEntityBlockPositionChanged(__instance, ___blockPosStandingOn);
+                if (EjectionManager.OnDamageBlock(_world, _blockPos, _entityIdThatDamaged))
+                {
+                    _log.Trace($"Prefix: _clrIdx: {_clrIdx}, _blockPos: {_blockPos}, _blockValue: {_blockValue}, _damagePoints: {_damagePoints}, _entityIdThatDamaged: {_entityIdThatDamaged}");
+                    __result = 0;
+                    return false;
+                }
             }
             catch (Exception e)
             {
-                _log.Error($"EntityAlive_updateCurrentBlockPosAndValue_Patches Postfix failed: handle block pos change for {__instance}.", e);
+                _log.Error("Prefix", e);
             }
+            return true;
         }
     }
 }

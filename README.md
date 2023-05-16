@@ -19,7 +19,6 @@ TODO: ![raid-hours social image](https://raw.githubusercontent.com/jonathan-robe
 
 ## Features
 
-- admin can enter any claim's zone at any time by first entering spectator mode (`sm`)
-- auto-warp players out of any claimed land on login (even during raid hours, even if Raid Protection is disabled) and this solves 2 problems:
+- auto-warp players out of any claimed land on login (even during raid hours) and this solves 2 problems:
   1. prevents raiders from squatting and logging out in hostile claimed land (or base) during Raid Hours only to log back in during Build Hours and cause havoc.
   2. prevents trap bases or trolls from enclosing players in an inescapable prison by making surrounding blocks invincible with a land claim.

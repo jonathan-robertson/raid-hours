@@ -10,18 +10,16 @@ namespace RaidHours
         public string TimeZoneString { get; set; } = TimeZoneInfo.Utc.Id;
         public TimeTrigger RaidModeStartTime { get; set; } = new TimeTrigger();
         public TimeTrigger RaidModeStopTime { get; set; } = new TimeTrigger();
-        public bool RaidProtectionEnabled { get; set; } = true;
 
         public override string ToString()
         {
-            return $"[TimeZoneString: {TimeZoneString}, RaidModeStartTime: {RaidModeStartTime}, RaidModeStopTime: {RaidModeStopTime}, RaidProtectionEnabled: {RaidProtectionEnabled}]";
+            return $"[TimeZoneString: {TimeZoneString}, RaidModeStartTime: {RaidModeStartTime}, RaidModeStopTime: {RaidModeStopTime}]";
         }
     }
 
     internal class SettingsManager
     {
         private const string NameTimeZoneString = "timeZone";
-        private const string NameRaidProtectionEnabled = "raidProtectionEnabled";
         private const string NameRaidModeStartTime = "raidModeStartTime";
         private const string NameRaidModeStopTime = "raidModeStopTime";
 
@@ -33,22 +31,10 @@ namespace RaidHours
         public static TimeZoneInfo TimeZoneInfo { get; private set; } = TimeZoneInfo.Utc;
         public static TimeTrigger RaidModeStartTime => settings.RaidModeStartTime;
         public static TimeTrigger RaidModeStopTime => settings.RaidModeStopTime;
-        public static bool RaidProtectionEnabled => settings.RaidProtectionEnabled;
 
         public static string AsString()
         {
             return settings.ToString();
-        }
-
-        public static bool SetRaidProtectionEnabled(bool enabled)
-        {
-            if (RaidProtectionEnabled != enabled)
-            {
-                settings.RaidProtectionEnabled = enabled;
-                Save();
-                return true;
-            }
-            return false;
         }
 
         public static bool SetRaidModeStartTime(TimeTrigger time)
@@ -102,17 +88,6 @@ namespace RaidHours
                     TimeZoneInfo = TimeZoneInfo.Utc;
                     _log.Error($"Failed to parse the included {NameTimeZoneString} value of '{loadedSettings.TimeZoneString}'; falling back to default time zone of {TimeZoneInfo.Id}");
                     loadedSettings.TimeZoneString = "UTC";
-                }
-
-                var zrpEnabledValue = config.Descendants(NameRaidProtectionEnabled).First().Value;
-                if (bool.TryParse(zrpEnabledValue, out var zrpEnabled))
-                {
-                    loadedSettings.RaidProtectionEnabled = zrpEnabled;
-                }
-                else
-                {
-                    _log.Error($"Failed to parse the included {NameRaidProtectionEnabled} of '{zrpEnabledValue}'; falling back to default value of {false}");
-                    loadedSettings.RaidProtectionEnabled = false;
                 }
 
                 var startTimeNode = config.Descendants(NameRaidModeStartTime).First();
@@ -184,7 +159,6 @@ namespace RaidHours
             {
                 new XElement("config",
                     new XElement(NameTimeZoneString, settings.TimeZoneString),
-                    new XElement(NameRaidProtectionEnabled, settings.RaidProtectionEnabled),
                     new XElement(ConvertToElement(NameRaidModeStartTime, settings.RaidModeStartTime)),
                     new XElement(ConvertToElement(NameRaidModeStopTime, settings.RaidModeStopTime)))
                 .Save(filename);
