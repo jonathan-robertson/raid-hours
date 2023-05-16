@@ -12,6 +12,7 @@ namespace RaidHours
     {
         private static readonly ModLog<EjectionManager> _log = new ModLog<EjectionManager>();
 
+        internal static string MobRaidingProtectionWarpName { get; private set; } = "raidHoursMobRaidingProtectionWarp";
         internal static string LoginProtectionWarpName { get; private set; } = "raidHoursLoginProtectionWarp";
 
         /// <summary>
@@ -46,8 +47,11 @@ namespace RaidHours
                 && !IsLandClaimOccupiedByOwnerOrAllies(world, landClaimPos, landClaimOwner))
             {
                 _log.Trace($"damage from {entityIdThatDamaged} was prevented");
-                _ = world.RemoveEntity(entityIdThatDamaged, EnumRemoveEntityReason.Despawned);
-                EjectPlayersFromClaimedLand(world, landClaimPos);
+
+                EjectEntitiesFromLandClaim(GameManager.Instance.World, landClaimPos);
+                // TODO: instead of the line above, consider doing the two lines below...
+                //_ = world.RemoveEntity(entityIdThatDamaged, EnumRemoveEntityReason.Despawned);
+                //EjectPlayersFromClaimedLand(world, landClaimPos);
                 return true;
             }
             return false;
@@ -139,20 +143,38 @@ namespace RaidHours
             Eject(player);
         }
 
-        private static void Eject(EntityPlayer player)
+        private static void Eject(EntityAlive entity)
         {
-            _log.Trace($"Ejecting {player.entityId}");
-            var rand = player.world.GetGameRandom();
+            _log.Trace($"Ejecting {entity.entityId}");
+            var rand = entity.world.GetGameRandom();
             var normalized = new Vector3(0.5f - rand.RandomFloat, 0f, 0.5f - rand.RandomFloat).normalized;
-            var vector = player.position + (normalized * 5f);
+            var vector = entity.position + (normalized * 5f);
             var num = 20;
             while (TryGetActiveLandClaimContaining(new Vector3i(vector), out var _, out var _) && --num > 0)
             {
                 vector += normalized * 5f;
             }
-            vector.y = player.world.GetHeight((int)vector.x, (int)vector.z) + 1;
+            vector.y = entity.world.GetHeight((int)vector.x, (int)vector.z) + 1;
 
-            Warp(player, vector);
+            Warp(entity, vector);
+        }
+
+        private static void EjectEntitiesFromLandClaim(World world, Vector3i landClaimPos)
+        {
+            _log.Trace($"EjectEntitiesFromLandClaim at {landClaimPos}");
+            EntityAlive entity;
+            var bounds = new Bounds(landClaimPos, ModApi.LandClaimBoundsSize);
+            var entities = world.GetLivingEntitiesInBounds(null, bounds);
+            for (var i = 0; i < entities.Count; i++)
+            {
+                entity = entities[i];
+                if (entity is EntityPlayer player && player.IsSpectator) { continue; }
+                if (IsWithinLandClaimAtBlockPos(entity.GetBlockPosition(), landClaimPos))
+                {
+                    _ = entity.Buffs.AddBuff(MobRaidingProtectionWarpName);
+                    Eject(entity);
+                }
+            }
         }
 
         private static void EjectPlayersFromClaimedLand(WorldBase world, Vector3i landClaimPos)
@@ -165,8 +187,23 @@ namespace RaidHours
                 if (!player.IsSpectator
                     && IsWithinLandClaimAtBlockPos(player.GetBlockPosition(), landClaimPos))
                 {
+                    _ = player.Buffs.AddBuff(MobRaidingProtectionWarpName);
                     Eject(player);
                 }
+            }
+        }
+
+        private static void Warp(EntityAlive entity, Vector3 destination)
+        {
+            if (entity is EntityZombie || entity is EntityAnimal)
+            {
+                entity.SetPosition(destination, true);
+                return;
+            }
+            if (entity is EntityPlayer player)
+            {
+                Warp(player, destination);
+                return;
             }
         }
 
@@ -178,17 +215,17 @@ namespace RaidHours
                 SingletonMonoBehaviour<ConnectionManager>.Instance.Clients.ForEntityId(player.entityId).SendPackage(NetPackageManager.GetPackage<NetPackageTeleportPlayer>().Setup(destination, null, false));
                 return;
             }
-            if (player)
+            if (player != null) // TODO: this seems... off
             {
                 player.Teleport(destination, float.MinValue);
                 return;
             }
-            if (player.AttachedToEntity != null)
+            if (player.AttachedToEntity != null) // TODO: this seems... off
             {
                 player.AttachedToEntity.SetPosition(destination, true);
                 return;
             }
-            player.SetPosition(destination, true);
+            player.SetPosition(destination, true); // TODO: this seems... off
         }
     }
 }
