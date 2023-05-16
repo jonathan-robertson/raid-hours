@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using System;
 using System.Reflection;
+using UnityEngine;
 
 namespace RaidHours
 {
@@ -11,6 +12,7 @@ namespace RaidHours
         internal static int LandClaimSize { get; private set; }
         internal static int LandClaimRadiusMin { get; private set; }
         internal static float LandClaimRadiusMax { get; private set; }
+        internal static Vector3 LandClaimBoundsSize { get; private set; }
         public static int LandClaimExpiryHours { get; private set; }
 
         internal static bool IsServer { get; private set; }
@@ -38,6 +40,7 @@ namespace RaidHours
                     LandClaimSize = GameStats.GetInt(EnumGameStats.LandClaimSize); // 41 is the default, for example
                     LandClaimRadiusMin = LandClaimSize % 2 == 1 ? (LandClaimSize - 1) / 2 : LandClaimSize / 2;
                     LandClaimRadiusMax = (float)Math.Sqrt(Math.Pow(LandClaimRadiusMin, 2) * 2) + 1;
+                    LandClaimBoundsSize = new Vector3(LandClaimSize + LandClaimRadiusMin, 255, LandClaimSize + LandClaimRadiusMin);
                     LandClaimExpiryHours = GameStats.GetInt(EnumGameStats.LandClaimExpiryTime) * 24;
                     _log.Debug($"LandClaimSize: {LandClaimSize}, LandClaimRadiusMin: {LandClaimRadiusMin}, LandClaimRadiusMax: {LandClaimRadiusMax}, LandClaimExpiryHours: {LandClaimExpiryHours}");
                     ScheduleManager.OnGameStartDone();
