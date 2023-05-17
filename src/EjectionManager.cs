@@ -47,11 +47,15 @@ namespace RaidHours
                 && !IsLandClaimOccupiedByOwnerOrAllies(world, landClaimPos, landClaimOwner))
             {
                 _log.Trace($"damage from {entityIdThatDamaged} was prevented");
-
-                EjectEntitiesFromLandClaim(GameManager.Instance.World, landClaimPos);
-                // TODO: instead of the line above, consider doing the two lines below...
-                //_ = world.RemoveEntity(entityIdThatDamaged, EnumRemoveEntityReason.Despawned);
-                //EjectPlayersFromClaimedLand(world, landClaimPos);
+                if (world.GetAIDirector().BloodMoonComponent.BloodMoonActive)
+                {
+                    EjectEntitiesFromLandClaim(GameManager.Instance.World, landClaimPos);
+                }
+                else
+                {
+                    _ = world.RemoveEntity(entityIdThatDamaged, EnumRemoveEntityReason.Despawned);
+                    //EjectPlayersFromClaimedLand(world, landClaimPos);
+                }
                 return true;
             }
             return false;
