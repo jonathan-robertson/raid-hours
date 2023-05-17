@@ -13,7 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - finish teaser video
 - update build/raid text to reflect start/end times and timezone reference... perhaps +06:00 reference since these use numbers (cvar-supported)? :)
 
-## [0.3.0] - 2023-05-15
+## [0.4.0] - 2023-05-17
+
+- unload striking non-player outside of blood moon
+- warp away from lcb only during blood moon
+
+## [0.3.0] - 2023-05-16
 
 - add color/info to journal entry
 - add notification when ejected for mob protection

@@ -14,7 +14,6 @@ namespace RaidHours
             {
                 if (EjectionManager.OnDamageBlock(_world, _blockPos, _entityIdThatDamaged))
                 {
-                    _log.Trace($"Prefix: _clrIdx: {_clrIdx}, _blockPos: {_blockPos}, _blockValue: {_blockValue}, _damagePoints: {_damagePoints}, _entityIdThatDamaged: {_entityIdThatDamaged}");
                     __result = 0;
                     return false;
                 }
