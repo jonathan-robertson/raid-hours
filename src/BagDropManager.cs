@@ -17,10 +17,15 @@
         public const string BUFF_DROP_MODE_NAME = "raidHoursDropMode";
         public static DropOption Default { get; set; } = DropOption.None;
 
+        public static void DropBagNow(EntityPlayer player)
+        {
+            _log.Trace($"DropBagNow: {player.entityId}");
+            // TODO: implement bag drop
+        }
+
         public static void RefreshBagDropOnLogoutState(EntityAlive entityAlive, Vector3i blockPos)
         {
-            if (ModApi.IsServer 
-                && ScheduleManager.CurrentState == GameState.Raid
+            if (ModApi.IsServer
                 && entityAlive is EntityPlayer player)
             {
                 if (!player.IsSpectator
@@ -61,7 +66,8 @@
 
         private static void UpdateBagDropOnLogoutState(EntityPlayer player, DropOption dropOption)
         {
-            if (player.GetCVar(CVAR_BAG_DROP_MODE_NAME) == (int)dropOption)
+            var bagDropOptionInt = (int)dropOption;
+            if (player.GetCVar(CVAR_BAG_DROP_MODE_NAME) == bagDropOptionInt)
             {
                 return;
             }
@@ -71,17 +77,17 @@
             {
                 var prefValue = GameStats.GetInt(EnumGameStats.DropOnQuit);
                 var clientInfo = ConnectionManager.Instance.Clients.ForEntityId(player.entityId);
-                GameStats.Set(EnumGameStats.DropOnQuit, (int)dropOption);
+                GameStats.Set(EnumGameStats.DropOnQuit, bagDropOptionInt);
                 var netPackage = NetPackageManager.GetPackage<NetPackageGameStats>().Setup(GameStats.Instance);
                 clientInfo?.SendPackage(netPackage);
                 GameStats.Set(EnumGameStats.DropOnQuit, prefValue);
             }
             else
             {
-                GameStats.Set(EnumGameStats.DropOnQuit, (int)dropOption); // note: does not support split screen
+                GameStats.Set(EnumGameStats.DropOnQuit, bagDropOptionInt); // note: does not support split screen
             }
             //player.Buffs.AddBuff(BuffRaidHoursDropModeName);
-            player.SetCVar(CVAR_BAG_DROP_MODE_NAME, 1);
+            player.SetCVar(CVAR_BAG_DROP_MODE_NAME, bagDropOptionInt);
         }
     }
 }

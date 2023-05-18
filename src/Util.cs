@@ -109,23 +109,7 @@ namespace RaidHours
         public static IEnumerator EjectLater(EntityPlayer player, float delay, string buffName)
         {
             yield return new WaitForSeconds(delay);
-            _ = player.Buffs.AddBuff(buffName);
-            Eject(player);
-        }
-
-        public static void Eject(EntityAlive entity)
-        {
-            var rand = entity.world.GetGameRandom();
-            var normalized = new Vector3(0.5f - rand.RandomFloat, 0f, 0.5f - rand.RandomFloat).normalized;
-            var vector = entity.position + (normalized * 5f);
-            var num = 20;
-            while (TryGetActiveLandClaimContaining(new Vector3i(vector), out var _, out var _) && --num > 0)
-            {
-                vector += normalized * 5f;
-            }
-            vector.y = entity.world.GetHeight((int)vector.x, (int)vector.z) + 1;
-
-            Warp(entity, vector);
+            Warp(player, FindPositionOutsideLandClaim(player), buffName);
         }
 
         public static void EjectEntitiesFromLandClaim(World world, Vector3i landClaimPos, string buffName)
@@ -136,16 +120,48 @@ namespace RaidHours
             for (var i = 0; i < entities.Count; i++)
             {
                 entity = entities[i];
-                if (entity is EntityPlayer player && player.IsSpectator) { continue; }
-                if (IsWithinLandClaimAtBlockPos(entity.GetBlockPosition(), landClaimPos))
+                if (entity is EntityPlayer player)
                 {
-                    if (buffName != null)
+                    if (!player.IsSpectator)
                     {
-                        _ = entity.Buffs.AddBuff(buffName);
+                        Eject(player, landClaimPos, buffName);
                     }
-                    Eject(entity);
+                }
+                else
+                {
+                    Eject(entity, landClaimPos);
                 }
             }
+        }
+
+        public static void Eject(EntityAlive entity, Vector3i landClaimPos)
+        {
+            if (IsWithinLandClaimAtBlockPos(entity.GetBlockPosition(), landClaimPos))
+            {
+                entity.SetPosition(FindPositionOutsideLandClaim(entity), true);
+            }
+        }
+
+        public static void Eject(EntityPlayer player, Vector3i landClaimPos, string buffName)
+        {
+            if (IsWithinLandClaimAtBlockPos(player.GetBlockPosition(), landClaimPos))
+            {
+                Warp(player, FindPositionOutsideLandClaim(player), buffName);
+            }
+        }
+
+        private static Vector3 FindPositionOutsideLandClaim(EntityAlive entity)
+        {
+            var rand = entity.world.GetGameRandom();
+            var normalized = new Vector3(0.5f - rand.RandomFloat, 0f, 0.5f - rand.RandomFloat).normalized;
+            var vector = entity.position + (normalized * 5f);
+            var num = 20;
+            while (TryGetActiveLandClaimContaining(new Vector3i(vector), out var _, out var _) && --num > 0)
+            {
+                vector += normalized * 5f;
+            }
+            vector.y = entity.world.GetHeight((int)vector.x, (int)vector.z) + 1;
+            return vector;
         }
 
         public static void EjectPlayersFromClaimedLand(WorldBase world, Vector3i landClaimPos, string buffName)
@@ -157,48 +173,24 @@ namespace RaidHours
                 if (!player.IsSpectator
                     && IsWithinLandClaimAtBlockPos(player.GetBlockPosition(), landClaimPos))
                 {
-                    if (buffName != null)
-                    {
-                        _ = player.Buffs.AddBuff(buffName);
-                    }
-                    Eject(player);
+                    Warp(player, FindPositionOutsideLandClaim(player), buffName);
                 }
             }
         }
 
-        public static void Warp(EntityAlive entity, Vector3 destination)
+        public static void Warp(EntityPlayer player, Vector3 destination, string buffName)
         {
-            if (entity is EntityZombie || entity is EntityAnimal)
+            _ = player.Buffs.AddBuff(buffName);
+            if (player is EntityPlayerLocal localPlayer)
             {
-                entity.SetPosition(destination, true);
-                return;
+                localPlayer.TeleportToPosition(destination, false);
             }
-            if (entity is EntityPlayer player)
+            else
             {
-                Warp(player, destination);
-                BagDropManager.RefreshBagDropOnLogoutState(player, new Vector3i(destination));
-                return;
+                var client = SingletonMonoBehaviour<ConnectionManager>.Instance.Clients.ForEntityId(player.entityId);
+                client?.SendPackage(NetPackageManager.GetPackage<NetPackageTeleportPlayer>().Setup(destination, null, false));
             }
-        }
-
-        public static void Warp(EntityPlayer player, Vector3 destination)
-        {
-            if (player.isEntityRemote)
-            {
-                SingletonMonoBehaviour<ConnectionManager>.Instance.Clients.ForEntityId(player.entityId).SendPackage(NetPackageManager.GetPackage<NetPackageTeleportPlayer>().Setup(destination, null, false));
-                return;
-            }
-            if (player != null) // TODO: this seems... off
-            {
-                player.Teleport(destination, float.MinValue);
-                return;
-            }
-            if (player.AttachedToEntity != null) // TODO: this seems... off
-            {
-                player.AttachedToEntity.SetPosition(destination, true);
-                return;
-            }
-            player.SetPosition(destination, true); // TODO: this seems... off
+            BagDropManager.RefreshBagDropOnLogoutState(player, new Vector3i(destination));
         }
     }
 }

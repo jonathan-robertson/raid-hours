@@ -10,6 +10,7 @@
         private static readonly ModLog<EjectionManager> _log = new ModLog<EjectionManager>();
 
         internal static string MobRaidingProtectionWarpName { get; private set; } = "raidHoursMobRaidingProtectionWarp";
+        internal static string ModeChangeWarpName { get; private set; } = "raidHoursModeChangeWarp";
         internal static string LoginProtectionWarpName { get; private set; } = "raidHoursLoginProtectionWarp";
 
         /// <summary>
@@ -21,7 +22,8 @@
         internal static void OnPlayerSpawnedInWorld(EntityPlayer player, PlatformUserIdentifierAbs playerId, Vector3i blockPos)
         {
             _log.Trace($"OnPlayerSpawnedInWorld: {player}, {playerId}, {blockPos}");
-            if (!player.IsSpectator
+            if (ScheduleManager.CurrentState == GameState.Build
+                && !player.IsSpectator
                 && Util.TryGetLandClaimOwnerRelationship(playerId, blockPos, out _, out var relationship)
                 && relationship == Relationship.None)
             {
@@ -56,6 +58,26 @@
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Trigger that fires when raid mode changes due to schedule for already-online players.
+        /// </summary>
+        /// <param name="newGameState">GameState we're switching to.</param>
+        /// <param name="players">Players to warp if within range of any hostile land claims.</param>
+        internal static void OnScheduledRaidModeChanged(World world, EntityPlayer player, GameState newGameState)
+        {
+            _log.Trace($"OnScheduledRaidModeChanged: {player.entityId} {newGameState}");
+            if (player.IsSpectator) { return; }
+            if (newGameState == GameState.Build)
+            {
+                BagDropManager.DropBagNow(player);
+            }
+            if (Util.TryGetActiveLandClaimContaining(player.GetBlockPosition(), out var landClaimPos, out var landClaimOwner)
+                && !Util.IsLandClaimOccupiedByOwnerOrAllies(world, landClaimPos, landClaimOwner))
+            {
+                Util.Eject(player, landClaimPos, ModeChangeWarpName);
+            }
         }
     }
 }

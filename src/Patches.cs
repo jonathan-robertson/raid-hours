@@ -39,7 +39,8 @@ namespace RaidHours
         {
             try
             {
-                if (ModApi.IsServer)
+                if (ModApi.IsServer
+                    && ScheduleManager.CurrentState == GameState.Raid)
                 {
                     BagDropManager.RefreshBagDropOnLogoutState(__instance, ___blockPosStandingOn);
                 }

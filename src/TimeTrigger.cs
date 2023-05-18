@@ -15,6 +15,10 @@ namespace RaidHours
             MinOfHour = minOfHour;
         }
 
+
+        // TODO: this math is wrong - at 15:30, start time of h=15 and end time of h=20, the game thinks build mode is active.
+        //  at end time of h=22, it thinks raid mode is now active.
+        //  clearly, something is wrong
         public int MinutesUntil(DateTime dt)
         {
             if (DayOfWeek.HasValue && HourOfDay.HasValue)

@@ -72,11 +72,11 @@ namespace RaidHours
                     }
 
                     ScheduleManager.OnPlayerSpawnedInWorld(player);
-                    BagDropManager.RefreshBagDropOnLogoutState(player, _pos);
                     if (Util.TryGetUserIdFor(_clientInfo, out var userId))
                     {
                         EjectionManager.OnPlayerSpawnedInWorld(player, userId, _pos);
                     }
+                    BagDropManager.RefreshBagDropOnLogoutState(player, _pos);
                 }
             }
             catch (Exception e)
