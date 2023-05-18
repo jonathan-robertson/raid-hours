@@ -76,6 +76,20 @@ namespace RaidHours
                         if (_params.Count == 1) { break; }
                         switch (_params[1].ToLower())
                         {
+                            case "update":
+                                if (_params.Count == 3 && float.TryParse(_params[2].ToLower(), out var floatValue))
+                                {
+                                    if (_senderInfo.IsLocalGame)
+                                    {
+                                        GameManager.Instance.World.GetLocalPlayers()[0].SetCVar(BagDropManager.CVAR_BAG_DROP_MODE_NAME, floatValue);
+                                    }
+                                    else if (GameManager.Instance.World.Players.dict.TryGetValue(_senderInfo.RemoteClientInfo.entityId, out var playerForCvar))
+                                    {
+                                        playerForCvar.SetCVar(BagDropManager.CVAR_BAG_DROP_MODE_NAME, floatValue);
+                                    }
+                                    return;
+                                }
+                                break;
                             case "timezone":
                                 if (_params.Count == 3)
                                 {

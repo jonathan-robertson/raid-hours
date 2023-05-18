@@ -73,42 +73,42 @@ namespace RaidHours
         private static void HandleStateChange(GameState newState, params EntityPlayer[] players)
         {
             _log.Trace($"HandleStateChange: {newState}, {players.Length}");
-            int onlineModifier, offlineModifier;
-            string buff;
-            if (newState == GameState.Build)
+            var buff = "";
+            switch (newState)
             {
-                onlineModifier = 0;
-                offlineModifier = 0;
-                buff = BuffBuildModeName;
-            }
-            else
-            {
-                onlineModifier = DefaultLandClaimOnlineDurabilityModifier;
-                offlineModifier = DefaultLandClaimOfflineDurabilityModifier;
-                buff = BuffRaidModeName;
+                case GameState.Build:
+                    GameStats.Set(EnumGameStats.LandClaimOnlineDurabilityModifier, 0);
+                    GameStats.Set(EnumGameStats.LandClaimOfflineDurabilityModifier, 0);
+                    buff = BuffBuildModeName;
+                    break;
+                case GameState.Raid:
+                    GameStats.Set(EnumGameStats.LandClaimOnlineDurabilityModifier, DefaultLandClaimOnlineDurabilityModifier);
+                    GameStats.Set(EnumGameStats.LandClaimOfflineDurabilityModifier, DefaultLandClaimOfflineDurabilityModifier);
+                    buff = BuffRaidModeName;
+                    break;
             }
 
-            GameStats.Set(EnumGameStats.LandClaimOnlineDurabilityModifier, onlineModifier);
-            GameStats.Set(EnumGameStats.LandClaimOfflineDurabilityModifier, offlineModifier);
             var netPackage = NetPackageManager.GetPackage<NetPackageGameStats>().Setup(GameStats.Instance);
-            if (players.Length == 0)
+            if (players.Length == 0) // target all players (if none provided)
             {
                 var playerList = GameManager.Instance.World.Players.list;
-                ConnectionManager.Instance.SendPackage(netPackage);
+                ConnectionManager.Instance.SendPackage(netPackage); // can broadcast to all at once
                 for (var i = 0; i < playerList.Count; i++)
                 {
                     _ = playerList[i].Buffs.AddBuff(buff);
+                    BagDropManager.RefreshBagDropOnLogoutState(playerList[i], playerList[i].GetBlockPosition());
                 }
             }
             else
             {
                 for (var i = 0; i < players.Length; i++)
                 {
-                    _ = players[i].Buffs.AddBuff(buff);
                     if (players[i].isEntityRemote)
                     {
                         ConnectionManager.Instance.Clients.ForEntityId(players[i].entityId)?.SendPackage(netPackage);
-                    }
+                    } // local players automatically see the adjusted GameStats values set above
+                    _ = players[i].Buffs.AddBuff(buff);
+                    BagDropManager.RefreshBagDropOnLogoutState(players[i], players[i].GetBlockPosition());
                 }
             }
             _log.Debug($"Successfully updated player(s) to {newState} mode.");

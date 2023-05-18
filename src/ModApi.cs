@@ -42,7 +42,8 @@ namespace RaidHours
                     LandClaimRadiusMax = (float)Math.Sqrt(Math.Pow(LandClaimRadiusMin, 2) * 2) + 1;
                     LandClaimBoundsSize = new Vector3(LandClaimSize + LandClaimRadiusMin, 255, LandClaimSize + LandClaimRadiusMin);
                     LandClaimExpiryHours = GameStats.GetInt(EnumGameStats.LandClaimExpiryTime) * 24;
-                    _log.Debug($"LandClaimSize: {LandClaimSize}, LandClaimRadiusMin: {LandClaimRadiusMin}, LandClaimRadiusMax: {LandClaimRadiusMax}, LandClaimExpiryHours: {LandClaimExpiryHours}");
+                    BagDropManager.Default = (DropOption)GameStats.GetInt(EnumGameStats.DropOnQuit);
+                    _log.Debug($"LandClaimSize: {LandClaimSize}, LandClaimRadiusMin: {LandClaimRadiusMin}, LandClaimRadiusMax: {LandClaimRadiusMax}, LandClaimExpiryHours: {LandClaimExpiryHours}, DropOnQuit: {BagDropManager.Default}");
                     ScheduleManager.OnGameStartDone();
                 }
             }
@@ -61,8 +62,9 @@ namespace RaidHours
                     && (_respawnType == RespawnType.JoinMultiplayer  // remote player returns
                         || _respawnType == RespawnType.EnterMultiplayer  // remote player joins for the first time
                         || _respawnType == RespawnType.LoadedGame)) // local player/host just loaded the game
+                                                                    // TODO: missing a check for local player starting game for first time...
                 {
-                    var entityId = SafelyGetEntityIdFor(_clientInfo);
+                    var entityId = Util.SafelyGetEntityIdFor(_clientInfo);
                     if (!GameManager.Instance.World.Players.dict.TryGetValue(entityId, out var player))
                     {
                         _log.Trace($"Player could not be found with entityId of {entityId}. This is not expected.");
@@ -70,7 +72,8 @@ namespace RaidHours
                     }
 
                     ScheduleManager.OnPlayerSpawnedInWorld(player);
-                    if (TryGetUserIdFor(_clientInfo, out var userId))
+                    BagDropManager.RefreshBagDropOnLogoutState(player, _pos);
+                    if (Util.TryGetUserIdFor(_clientInfo, out var userId))
                     {
                         EjectionManager.OnPlayerSpawnedInWorld(player, userId, _pos);
                     }
@@ -96,33 +99,6 @@ namespace RaidHours
             {
                 _log.Error("Failed OnGameShutdown", e);
             }
-        }
-
-        private static int SafelyGetEntityIdFor(ClientInfo clientInfo)
-        {
-            return clientInfo != null
-                ? clientInfo.entityId
-                : GameManager.Instance.persistentLocalPlayer.EntityId;
-        }
-
-        private static bool TryGetUserIdFor(ClientInfo clientInfo, out PlatformUserIdentifierAbs userId)
-        {
-            userId = clientInfo != null
-                ? GameManager.Instance.persistentPlayers.GetPlayerDataFromEntityID(clientInfo.entityId)?.UserIdentifier
-                : GameManager.Instance.persistentLocalPlayer.UserIdentifier;
-            return userId != null;
-        }
-
-        internal static bool TryGetPlayerIdFromEntityId(int playerEntityId, out PlatformUserIdentifierAbs id)
-        {
-            var playerData = GameManager.Instance.persistentPlayers.GetPlayerDataFromEntityID(playerEntityId);
-            if (playerData != null)
-            {
-                id = playerData.UserIdentifier;
-                return true;
-            }
-            id = null;
-            return false;
         }
     }
 }
