@@ -18,10 +18,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - click eject to drop bag and warp during raid
 - click eject to warp and keep bag during build
+
+## IN-PROGRESS
+
 - drop bag when raid hours end in lcb
 
 ## [0.5.0] - UNRELEASED
 
+- add admin command to get current server time
 - add contextual ui indicator for bag drop mode
 - drop bag on logout during raid hours in lcb
 - eject on login during build hours in lcb
