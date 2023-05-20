@@ -17,12 +17,6 @@
         public const string BUFF_DROP_MODE_NAME = "raidHoursDropMode";
         public static DropOption Default { get; set; } = DropOption.None;
 
-        public static void DropBagNow(EntityPlayer player)
-        {
-            _log.Trace($"DropBagNow: {player.entityId}");
-            // TODO: implement bag drop
-        }
-
         public static void RefreshBagDropOnLogoutState(EntityAlive entityAlive, Vector3i blockPos)
         {
             if (ModApi.IsServer

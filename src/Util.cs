@@ -12,12 +12,23 @@ namespace RaidHours
                 : GameManager.Instance.persistentLocalPlayer.EntityId;
         }
 
-        public static bool TryGetUserIdFor(ClientInfo clientInfo, out PlatformUserIdentifierAbs userId)
+        public static PlatformUserIdentifierAbs GetUserIdentifier(ClientInfo clientInfo)
         {
-            userId = clientInfo != null
+            return clientInfo != null
                 ? GameManager.Instance.persistentPlayers.GetPlayerDataFromEntityID(clientInfo.entityId)?.UserIdentifier
                 : GameManager.Instance.persistentLocalPlayer.UserIdentifier;
-            return userId != null;
+        }
+
+        public static PersistentPlayerData GetPersistentPlayerData(ClientInfo clientInfo)
+        {
+            var persistentPlayerList = GameManager.Instance.persistentPlayers;
+            return persistentPlayerList?.GetPlayerData(GetUserIdentifier(clientInfo));
+        }
+
+        public static bool TryGetClientInfo(int entityId, out ClientInfo clientInfo)
+        {
+            clientInfo = ConnectionManager.Instance.Clients.ForEntityId(entityId);
+            return clientInfo != null;
         }
 
         public static bool TryGetPlayerIdFromEntityId(int playerEntityId, out PlatformUserIdentifierAbs id)

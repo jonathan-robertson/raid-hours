@@ -67,16 +67,16 @@
         /// <param name="players">Players to warp if within range of any hostile land claims.</param>
         internal static void OnScheduledRaidModeChanged(World world, EntityPlayer player, GameState newGameState)
         {
-            _log.Trace($"OnScheduledRaidModeChanged: {player.entityId} {newGameState}");
-            if (player.IsSpectator) { return; }
-            if (newGameState == GameState.Build)
+            if (!player.IsSpectator
+                && newGameState == GameState.Raid
+                && Util.TryGetActiveLandClaimContaining(player.GetBlockPosition(), out var landClaimPos, out var landClaimOwner)
+                && !Util.IsLandClaimOccupiedByOwnerOrAllies(world, landClaimPos, landClaimOwner)) // TODO: should this trigger regardless of owner/ally presence?
             {
-                BagDropManager.DropBagNow(player);
-            }
-            if (Util.TryGetActiveLandClaimContaining(player.GetBlockPosition(), out var landClaimPos, out var landClaimOwner)
-                && !Util.IsLandClaimOccupiedByOwnerOrAllies(world, landClaimPos, landClaimOwner))
-            {
-                Util.Eject(player, landClaimPos, ModeChangeWarpName);
+                _log.Trace($"OnScheduledRaidModeChanged: {player.entityId} {newGameState}");
+
+                // TODO: disconnect w/ kick message
+                // Your bag has been dropped. When you reconnect, you will be warped outside of the land claim you were in. To avoid this next time, escape the claimed land before raid hours end.
+
             }
         }
     }

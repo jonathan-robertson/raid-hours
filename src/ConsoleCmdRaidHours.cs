@@ -61,6 +61,7 @@ namespace RaidHours
                             if (_params.Count != 2) { break; }
                             if (!TryGetPlayerFromIdentifier(_params[1], out var player)) { return; }
                             ScheduleManager.OnPlayerSpawnedInWorld(player);
+                            BagDropManager.RefreshBagDropOnLogoutState(player, player.GetBlockPosition()); // force-refresh bag drop state 
                             SdtdConsole.Instance.Output($"Current raid state has been re-sent to player {player.GetDebugName()}.");
                             return;
                         case "settings":

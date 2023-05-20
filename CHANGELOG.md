@@ -12,25 +12,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - create and add social image to project and readme header
 - finish teaser video
 - fix scheduling calculations
-- update build/raid text to reflect start/end times and timezone reference... perhaps +06:00 reference since these use numbers (cvar-supported)? :)
+- update build/raid text to reflect start/end times and timezone reference... perhaps +06:00 reference since these use numbers (cvar-supported)?
 
 ## TODO
 
-- click eject to drop bag and warp during raid
-- click eject to warp and keep bag during build
+- ~~click eject to drop bag and warp during raid~~
+- ~~click eject to warp and keep bag during build~~
+- ~~drop bag when raid hours end in lcb~~
+- add contextual ui text for raid hours countdown
+- add contextual ui text for warp on login
+- disconnect raiders when raid hours end to drop bag
+- eject on login to lcb during raid hours
 
 ## IN-PROGRESS
 
-- drop bag when raid hours end in lcb
+- revert: eject when raid hours end in lcb
+- revert: eject when raid hours start in lcb
 
 ## [0.5.0] - UNRELEASED
 
 - add admin command to get current server time
-- add contextual ui indicator for bag drop mode
-- drop bag on logout during raid hours in lcb
-- eject on login during build hours in lcb
+- add contextual ui text for bag drop mode
+- drop bag on logout in lcb during raid hours
+- eject on login to lcb during build hours
 - eject when raid hours end in lcb
-- eject when raid hours start
+- eject when raid hours start in lcb
 
 ## [0.4.0] - 2023-05-17
 
