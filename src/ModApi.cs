@@ -61,8 +61,8 @@ namespace RaidHours
                 if (IsServer
                     && (_respawnType == RespawnType.JoinMultiplayer  // remote player returns
                         || _respawnType == RespawnType.EnterMultiplayer  // remote player joins for the first time
-                        || _respawnType == RespawnType.LoadedGame)) // local player/host just loaded the game
-                                                                    // TODO: missing a check for local player starting game for first time...
+                        || _respawnType == RespawnType.LoadedGame // local player/host loaded the game
+                        || _respawnType == RespawnType.NewGame)) // local player/host created a new game
                 {
                     var entityId = Util.SafelyGetEntityIdFor(_clientInfo);
                     if (!GameManager.Instance.World.Players.dict.TryGetValue(entityId, out var player))
