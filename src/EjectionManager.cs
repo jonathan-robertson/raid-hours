@@ -10,8 +10,7 @@
         private static readonly ModLog<EjectionManager> _log = new ModLog<EjectionManager>();
 
         internal static string MobRaidingProtectionWarpName { get; private set; } = "raidHoursMobRaidingProtectionWarp";
-        internal static string ModeChangeWarpName { get; private set; } = "raidHoursModeChangeWarp";
-        internal static string LoginProtectionWarpName { get; private set; } = "raidHoursLoginProtectionWarp";
+        internal static string SquattingProtectionWarpName { get; private set; } = "raidHoursSquattingProtectionWarp";
 
         /// <summary>
         /// Eject any player within a non-friendly land claim. Even if raid mode is active, even if this lcb has raid protection disabled, we will still eject becuase (1) this help secure a base if hostiles log out inside the base during raid mode only to log back in during build mode and (2) this prevents players from being trolled with invisible cages during build hours.
@@ -22,12 +21,11 @@
         internal static void OnPlayerSpawnedInWorld(EntityPlayer player, PlatformUserIdentifierAbs playerId, Vector3i blockPos)
         {
             _log.Trace($"OnPlayerSpawnedInWorld: {player}, {playerId}, {blockPos}");
-            if (ScheduleManager.CurrentState == GameState.Build
-                && !player.IsSpectator
+            if (!player.IsSpectator
                 && Util.TryGetLandClaimOwnerRelationship(playerId, blockPos, out _, out var relationship)
                 && relationship == Relationship.None)
             {
-                _ = ThreadManager.StartCoroutine(Util.EjectLater(player, 0.5f, LoginProtectionWarpName));
+                _ = ThreadManager.StartCoroutine(Util.EjectLater(player, 0.5f, SquattingProtectionWarpName));
             }
         }
 
@@ -53,31 +51,10 @@
                 else
                 {
                     _ = world.RemoveEntity(entityIdThatDamaged, EnumRemoveEntityReason.Despawned);
-                    //EjectPlayersFromClaimedLand(world, landClaimPos);
                 }
                 return true;
             }
             return false;
-        }
-
-        /// <summary>
-        /// Trigger that fires when raid mode changes due to schedule for already-online players.
-        /// </summary>
-        /// <param name="newGameState">GameState we're switching to.</param>
-        /// <param name="players">Players to warp if within range of any hostile land claims.</param>
-        internal static void OnScheduledRaidModeChanged(World world, EntityPlayer player, GameState newGameState)
-        {
-            if (!player.IsSpectator
-                && newGameState == GameState.Raid
-                && Util.TryGetActiveLandClaimContaining(player.GetBlockPosition(), out var landClaimPos, out var landClaimOwner)
-                && !Util.IsLandClaimOccupiedByOwnerOrAllies(world, landClaimPos, landClaimOwner)) // TODO: should this trigger regardless of owner/ally presence?
-            {
-                _log.Trace($"OnScheduledRaidModeChanged: {player.entityId} {newGameState}");
-
-                // TODO: disconnect w/ kick message
-                // Your bag has been dropped. When you reconnect, you will be warped outside of the land claim you were in. To avoid this next time, escape the claimed land before raid hours end.
-
-            }
         }
     }
 }

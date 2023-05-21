@@ -19,8 +19,7 @@
 
         public static void RefreshBagDropOnLogoutState(EntityAlive entityAlive, Vector3i blockPos)
         {
-            if (ModApi.IsServer
-                && entityAlive is EntityPlayer player)
+            if (entityAlive is EntityPlayer player)
             {
                 if (!player.IsSpectator
                     && Util.TryGetPlayerIdFromEntityId(player.entityId, out var playerId)
@@ -34,28 +33,6 @@
                     RestoreDefaultBagDropOnLogoutState(player);
                 }
             }
-        }
-
-        private static void RestoreDefaultBagDropOnLogoutState(EntityPlayer player)
-        {
-            if (player.GetCVar(CVAR_BAG_DROP_MODE_NAME) == (int)Default)
-            {
-                return;
-            }
-            _log.Trace($"RestoreDefaultBagDropOnLogout: {player.entityId}");
-
-            player.Buffs.RemoveBuff(BUFF_DROP_MODE_NAME);
-            if (player.isEntityRemote)
-            {
-                GameStats.Set(EnumGameStats.DropOnQuit, (int)Default);
-                var clientInfo = ConnectionManager.Instance.Clients.ForEntityId(player.entityId);
-                clientInfo?.SendPackage(NetPackageManager.GetPackage<NetPackageGameStats>().Setup(GameStats.Instance));
-            }
-            else
-            {
-                GameStats.Set(EnumGameStats.DropOnQuit, (int)Default); // note: does not support split screen
-            }
-            player.SetCVar(CVAR_BAG_DROP_MODE_NAME, 0);
         }
 
         private static void UpdateBagDropOnLogoutState(EntityPlayer player, DropOption dropOption)
@@ -80,8 +57,29 @@
             {
                 GameStats.Set(EnumGameStats.DropOnQuit, bagDropOptionInt); // note: does not support split screen
             }
-            //player.Buffs.AddBuff(BuffRaidHoursDropModeName);
             player.SetCVar(CVAR_BAG_DROP_MODE_NAME, bagDropOptionInt);
+        }
+
+        private static void RestoreDefaultBagDropOnLogoutState(EntityPlayer player)
+        {
+            if (player.GetCVar(CVAR_BAG_DROP_MODE_NAME) == (int)Default)
+            {
+                return;
+            }
+            _log.Trace($"RestoreDefaultBagDropOnLogout: {player.entityId}");
+
+            player.Buffs.RemoveBuff(BUFF_DROP_MODE_NAME);
+            if (player.isEntityRemote)
+            {
+                GameStats.Set(EnumGameStats.DropOnQuit, (int)Default);
+                var clientInfo = ConnectionManager.Instance.Clients.ForEntityId(player.entityId);
+                clientInfo?.SendPackage(NetPackageManager.GetPackage<NetPackageGameStats>().Setup(GameStats.Instance));
+            }
+            else
+            {
+                GameStats.Set(EnumGameStats.DropOnQuit, (int)Default); // note: does not support split screen
+            }
+            player.SetCVar(CVAR_BAG_DROP_MODE_NAME, 0);
         }
     }
 }

@@ -94,7 +94,6 @@ namespace RaidHours
                 players = GameManager.Instance.World.Players.list.ToArray();
             }
 
-            var world = GameManager.Instance.World;
             var netPackage = NetPackageManager.GetPackage<NetPackageGameStats>().Setup(GameStats.Instance);
             for (var i = 0; i < players.Length; i++)
             {
@@ -104,8 +103,6 @@ namespace RaidHours
                     ConnectionManager.Instance.Clients.ForEntityId(players[i].entityId)?.SendPackage(netPackage);
                 }
                 _ = players[i].Buffs.AddBuff(buff);
-                EjectionManager.OnScheduledRaidModeChanged(world, players[i], CurrentState);
-                BagDropManager.RefreshBagDropOnLogoutState(players[i], players[i].GetBlockPosition());
             }
             _log.Debug($"Successfully updated player(s) to {newState} mode.");
         }

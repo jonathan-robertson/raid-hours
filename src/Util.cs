@@ -201,7 +201,12 @@ namespace RaidHours
                 var client = SingletonMonoBehaviour<ConnectionManager>.Instance.Clients.ForEntityId(player.entityId);
                 client?.SendPackage(NetPackageManager.GetPackage<NetPackageTeleportPlayer>().Setup(destination, null, false));
             }
-            BagDropManager.RefreshBagDropOnLogoutState(player, new Vector3i(destination));
+            //BagDropManager.RefreshBagDropOnLogoutState(player, new Vector3i(destination)); // TODO: test, maybe patch TeleportToPosition
+        }
+
+        public static EntityPlayerLocal GetLocalPlayer(int entityId)
+        {
+            return GameManager.Instance.World.GetLocalPlayerFromID(entityId);
         }
     }
 }

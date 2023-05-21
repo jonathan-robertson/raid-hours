@@ -8,11 +8,11 @@ namespace RaidHours
     {
         private static readonly ModLog<Block_DamageBlock_Patch> _log = new ModLog<Block_DamageBlock_Patch>();
 
-        public static bool Prefix(WorldBase _world, int _clrIdx, Vector3i _blockPos, BlockValue _blockValue, int _damagePoints, int _entityIdThatDamaged, ref int __result)
+        public static bool Prefix(WorldBase _world, Vector3i _blockPos, int _entityIdThatDamaged, ref int __result)
         {
             try
             {
-                if (EjectionManager.OnDamageBlock(_world, _blockPos, _entityIdThatDamaged))
+                if (ModApi.IsServer && EjectionManager.OnDamageBlock(_world, _blockPos, _entityIdThatDamaged))
                 {
                     __result = 0;
                     return false;
@@ -39,8 +39,7 @@ namespace RaidHours
         {
             try
             {
-                if (ModApi.IsServer
-                    && ScheduleManager.CurrentState == GameState.Raid)
+                if (ModApi.IsServer)
                 {
                     BagDropManager.RefreshBagDropOnLogoutState(__instance, ___blockPosStandingOn);
                 }
