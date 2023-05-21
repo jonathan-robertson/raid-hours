@@ -11,7 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add more info to readme
 - create and add social image to project and readme header
 - finish teaser video
-- update build/raid text to reflect start/end times and timezone reference... perhaps +06:00 reference since these use numbers (cvar-supported)? :)
+- update build/raid text to reflect start/end times and timezone reference... perhaps +06:00 reference since these use numbers (cvar-supported)?
+
+## [0.5.0] - 2023-05-21
+
+- add admin command to get current server time
+- add contextual ui text for bag drop mode
+- drop bag on logout in hostile lcb
+- eject when logging into hostile lcb
+- fix startup triggers for new local game
+- update journal entry for bag drop mode
 
 ## [0.4.0] - 2023-05-17
 

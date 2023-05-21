@@ -48,7 +48,7 @@ namespace RaidHours
             DefaultLandClaimOnlineDurabilityModifier = GameStats.GetInt(EnumGameStats.LandClaimOnlineDurabilityModifier);
             DefaultLandClaimOfflineDurabilityModifier = GameStats.GetInt(EnumGameStats.LandClaimOfflineDurabilityModifier);
 
-            var wait = new WaitForSeconds(59f); // wait just shy of 1 minute
+            var wait = new WaitForSeconds(15f);
             while (true)
             {
                 CheckAndHandleStateChange();
@@ -59,6 +59,7 @@ namespace RaidHours
         internal static void CheckAndHandleStateChange(params EntityPlayer[] players)
         {
             var currentTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, SettingsManager.TimeZoneInfo);
+
             CurrentState = SettingsManager.RaidModeStopTime.MinutesUntil(currentTime) < SettingsManager.RaidModeStartTime.MinutesUntil(currentTime)
                 ? GameState.Raid
                 : GameState.Build;
@@ -73,43 +74,35 @@ namespace RaidHours
         private static void HandleStateChange(GameState newState, params EntityPlayer[] players)
         {
             _log.Trace($"HandleStateChange: {newState}, {players.Length}");
-            int onlineModifier, offlineModifier;
-            string buff;
-            if (newState == GameState.Build)
+            var buff = "";
+            switch (newState)
             {
-                onlineModifier = 0;
-                offlineModifier = 0;
-                buff = BuffBuildModeName;
-            }
-            else
-            {
-                onlineModifier = DefaultLandClaimOnlineDurabilityModifier;
-                offlineModifier = DefaultLandClaimOfflineDurabilityModifier;
-                buff = BuffRaidModeName;
+                case GameState.Build:
+                    GameStats.Set(EnumGameStats.LandClaimOnlineDurabilityModifier, 0);
+                    GameStats.Set(EnumGameStats.LandClaimOfflineDurabilityModifier, 0);
+                    buff = BuffBuildModeName;
+                    break;
+                case GameState.Raid:
+                    GameStats.Set(EnumGameStats.LandClaimOnlineDurabilityModifier, DefaultLandClaimOnlineDurabilityModifier);
+                    GameStats.Set(EnumGameStats.LandClaimOfflineDurabilityModifier, DefaultLandClaimOfflineDurabilityModifier);
+                    buff = BuffRaidModeName;
+                    break;
             }
 
-            GameStats.Set(EnumGameStats.LandClaimOnlineDurabilityModifier, onlineModifier);
-            GameStats.Set(EnumGameStats.LandClaimOfflineDurabilityModifier, offlineModifier);
-            var netPackage = NetPackageManager.GetPackage<NetPackageGameStats>().Setup(GameStats.Instance);
-            if (players.Length == 0)
+            if (players.Length == 0) // target all players (if none provided)
             {
-                var playerList = GameManager.Instance.World.Players.list;
-                ConnectionManager.Instance.SendPackage(netPackage);
-                for (var i = 0; i < playerList.Count; i++)
-                {
-                    _ = playerList[i].Buffs.AddBuff(buff);
-                }
+                players = GameManager.Instance.World.Players.list.ToArray();
             }
-            else
+
+            var netPackage = NetPackageManager.GetPackage<NetPackageGameStats>().Setup(GameStats.Instance);
+            for (var i = 0; i < players.Length; i++)
             {
-                for (var i = 0; i < players.Length; i++)
+                if (players[i].isEntityRemote)
                 {
-                    _ = players[i].Buffs.AddBuff(buff);
-                    if (players[i].isEntityRemote)
-                    {
-                        ConnectionManager.Instance.Clients.ForEntityId(players[i].entityId)?.SendPackage(netPackage);
-                    }
+                    // local players automatically see the adjusted GameStats values set above
+                    ConnectionManager.Instance.Clients.ForEntityId(players[i].entityId)?.SendPackage(netPackage);
                 }
+                _ = players[i].Buffs.AddBuff(buff);
             }
             _log.Debug($"Successfully updated player(s) to {newState} mode.");
         }
