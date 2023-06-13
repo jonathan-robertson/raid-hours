@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RaidHours
+namespace RaidHours.Utilities
 {
     internal class ModLog<T>
     {

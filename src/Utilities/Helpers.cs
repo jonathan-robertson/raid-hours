@@ -1,9 +1,10 @@
-﻿using System.Collections;
+﻿using RaidHours.Managers;
+using System.Collections;
 using UnityEngine;
 
-namespace RaidHours
+namespace RaidHours.Utilities
 {
-    internal class Util
+    internal class Helpers
     {
         public static int SafelyGetEntityIdFor(ClientInfo clientInfo)
         {

@@ -1,8 +1,10 @@
-﻿using System;
+﻿using RaidHours.Data;
+using RaidHours.Managers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RaidHours
+namespace RaidHours.Commands
 {
     internal class ConsoleCmdRaidHours : ConsoleCmdAbstract
     {

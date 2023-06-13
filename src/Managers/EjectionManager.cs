@@ -1,4 +1,6 @@
-﻿namespace RaidHours
+﻿using RaidHours.Utilities;
+
+namespace RaidHours.Managers
 {
     internal enum Relationship
     {
@@ -22,10 +24,10 @@
         {
             _log.Trace($"OnPlayerSpawnedInWorld: {player}, {playerId}, {blockPos}");
             if (!player.IsSpectator
-                && Util.TryGetLandClaimOwnerRelationship(playerId, blockPos, out _, out var relationship)
+                && Helpers.TryGetLandClaimOwnerRelationship(playerId, blockPos, out _, out var relationship)
                 && relationship == Relationship.None)
             {
-                _ = ThreadManager.StartCoroutine(Util.EjectLater(player, 0.5f, SquattingProtectionWarpName));
+                _ = ThreadManager.StartCoroutine(Helpers.EjectLater(player, 0.5f, SquattingProtectionWarpName));
             }
         }
 
@@ -39,14 +41,14 @@
         internal static bool OnDamageBlock(WorldBase world, Vector3i blockPos, int entityIdThatDamaged)
         {
             _log.Trace($"OnDamageBlock: {blockPos}, {entityIdThatDamaged}");
-            if (Util.IsZombieOrAnimal(world, entityIdThatDamaged)
-                && Util.TryGetActiveLandClaimContaining(blockPos, out var landClaimPos, out var landClaimOwner)
-                && !Util.IsLandClaimOccupiedByOwnerOrAllies(world, landClaimPos, landClaimOwner))
+            if (Helpers.IsZombieOrAnimal(world, entityIdThatDamaged)
+                && Helpers.TryGetActiveLandClaimContaining(blockPos, out var landClaimPos, out var landClaimOwner)
+                && !Helpers.IsLandClaimOccupiedByOwnerOrAllies(world, landClaimPos, landClaimOwner))
             {
                 _log.Trace($"damage from {entityIdThatDamaged} was prevented");
                 if (world.GetAIDirector().BloodMoonComponent.BloodMoonActive)
                 {
-                    Util.EjectEntitiesFromLandClaim(GameManager.Instance.World, landClaimPos, MobRaidingProtectionWarpName);
+                    Helpers.EjectEntitiesFromLandClaim(GameManager.Instance.World, landClaimPos, MobRaidingProtectionWarpName);
                 }
                 else
                 {

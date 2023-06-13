@@ -1,8 +1,9 @@
-﻿using System;
+﻿using RaidHours.Utilities;
+using System;
 using System.Collections;
 using UnityEngine;
 
-namespace RaidHours
+namespace RaidHours.Managers
 {
     internal enum GameState
     {

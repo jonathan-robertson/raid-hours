@@ -1,9 +1,11 @@
-﻿using System;
+﻿using RaidHours.Data;
+using RaidHours.Utilities;
+using System;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace RaidHours
+namespace RaidHours.Managers
 {
     public class Settings
     {

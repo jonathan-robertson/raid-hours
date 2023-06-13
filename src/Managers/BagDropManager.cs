@@ -1,4 +1,6 @@
-﻿namespace RaidHours
+﻿using RaidHours.Utilities;
+
+namespace RaidHours.Managers
 {
     /// <summary>
     /// Type that will identify the configured drop option on disconnect or whatnot.
@@ -22,8 +24,8 @@
             if (entityAlive is EntityPlayer player)
             {
                 if (!player.IsSpectator
-                    && Util.TryGetPlayerIdFromEntityId(player.entityId, out var playerId)
-                    && Util.TryGetLandClaimOwnerRelationship(playerId, blockPos, out _, out var relationship)
+                    && Helpers.TryGetPlayerIdFromEntityId(player.entityId, out var playerId)
+                    && Helpers.TryGetLandClaimOwnerRelationship(playerId, blockPos, out _, out var relationship)
                     && relationship == Relationship.None)
                 {
                     UpdateBagDropOnLogoutState(player, DropOption.Backpack);

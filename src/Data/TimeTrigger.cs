@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RaidHours
+namespace RaidHours.Data
 {
     public class TimeTrigger
     {
