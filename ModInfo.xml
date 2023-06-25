@@ -1,9 +1,8 @@
 <xml>
-    <ModInfo>
-        <Name value="Raid Hours" />
-        <Description value="Real people have real lives; disable raiding while most players are at work or asleep." />
-        <Author value="Jonathan Robertson (Kanaverum)" />
-        <Version value="0.5.0" />
-        <Website value="https://github.com/jonathan-robertson/raid-hours" />
-    </ModInfo>
+    <Name value="kanaverum-raid-hours" />
+    <DisplayName value="Raid Hours" />
+    <Version value="1.0.0" />
+    <Description value="Real people have real lives; disable raiding while most players are at work or asleep." />
+    <Author value="Jonathan Robertson (Kanaverum)" />
+    <Website value="https://github.com/jonathan-robertson/raid-hours" />
 </xml>

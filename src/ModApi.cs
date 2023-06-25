@@ -1,4 +1,6 @@
 ﻿using HarmonyLib;
+using RaidHours.Managers;
+using RaidHours.Utilities;
 using System;
 using System.Reflection;
 using UnityEngine;
@@ -64,7 +66,7 @@ namespace RaidHours
                         || _respawnType == RespawnType.LoadedGame // local player/host loaded the game
                         || _respawnType == RespawnType.NewGame)) // local player/host created a new game
                 {
-                    var entityId = Util.SafelyGetEntityIdFor(_clientInfo);
+                    var entityId = Helpers.SafelyGetEntityIdFor(_clientInfo);
                     if (!GameManager.Instance.World.Players.dict.TryGetValue(entityId, out var player))
                     {
                         _log.Trace($"Player could not be found with entityId of {entityId}. This is not expected.");
@@ -72,7 +74,7 @@ namespace RaidHours
                     }
 
                     ScheduleManager.OnPlayerSpawnedInWorld(player);
-                    EjectionManager.OnPlayerSpawnedInWorld(player, Util.GetUserIdentifier(_clientInfo), _pos);
+                    EjectionManager.OnPlayerSpawnedInWorld(player, Helpers.GetUserIdentifier(_clientInfo), _pos);
                     BagDropManager.RefreshBagDropOnLogoutState(player, _pos);
                 }
             }
