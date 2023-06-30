@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - finish teaser video
 - update build/raid text to reflect start/end times and timezone reference... perhaps +06:00 reference since these use numbers (cvar-supported)?
 
+## [1.0.1] - 2023-06-30
+
+- update to support a21 b324 (stable)
+
 ## [1.0.0] - 2023-06-25
 
 - add journal entry on login

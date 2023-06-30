@@ -1,6 +1,6 @@
 # Raid Hours
 
-[![🧪 Tested On](https://img.shields.io/badge/🧪%20Tested%20On-A21%20b313-blue.svg)](https://7daystodie.com/) [![📦 Automated Release](https://github.com/jonathan-robertson/raid-hours/actions/workflows/release.yml/badge.svg)](https://github.com/jonathan-robertson/raid-hours/actions/workflows/release.yml)
+[![🧪 Tested On](https://img.shields.io/badge/🧪%20Tested%20On-A21%20b324-blue.svg)](https://7daystodie.com/) [![📦 Automated Release](https://github.com/jonathan-robertson/raid-hours/actions/workflows/release.yml/badge.svg)](https://github.com/jonathan-robertson/raid-hours/actions/workflows/release.yml)
 
 TODO: ![raid-hours social image](https://raw.githubusercontent.com/jonathan-robertson/raid-hours/media/raid-hours-logo-social.jpg)
 
