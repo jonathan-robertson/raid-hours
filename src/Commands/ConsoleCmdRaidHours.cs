@@ -32,12 +32,12 @@ namespace RaidHours.Commands
             help = $"Usage:\n  {string.Join("\n  ", dict.Keys.Select(command => $"{i++}. {GetCommands()[0]} {command}").ToList())}\nDescription Overview\n{string.Join("\n", dict.Values.Select(description => $"{j++}. {description}").ToList())}";
         }
 
-        protected override string[] getCommands()
+        public override string[] getCommands()
         {
             return Commands;
         }
 
-        protected override string getDescription()
+        public override string getDescription()
         {
             return "Configure or adjust settings for the Raid Hours mod.";
         }
