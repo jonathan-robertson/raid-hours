@@ -5,13 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [CONSIDERING]
+## [2.0.0] - TBH
 
-- add admin command to enable/disable schedule feature and return to default server state immediately?
-- add more info to readme
-- create and add social image to project and readme header
-- finish teaser video
-- update build/raid text to reflect start/end times and timezone reference... perhaps +06:00 reference since these use numbers (cvar-supported)?
+- update references for 7dtd-1.0-b333
 
 ## [1.0.1] - 2023-06-30
 
