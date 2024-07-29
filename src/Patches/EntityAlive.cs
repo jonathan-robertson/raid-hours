@@ -5,7 +5,7 @@ using System;
 
 namespace RaidHours.Patches
 {
-    [HarmonyPatch(typeof(EntityAlive), "updateCurrentBlockPosAndValue")]
+    [HarmonyPatch(typeof(EntityAlive), nameof(EntityAlive.updateCurrentBlockPosAndValue))]
     internal class EntityAlive_updateCurrentBlockPosAndValue_Patch
     {
         private static readonly ModLog<EntityAlive_updateCurrentBlockPosAndValue_Patch> _log = new ModLog<EntityAlive_updateCurrentBlockPosAndValue_Patch>();

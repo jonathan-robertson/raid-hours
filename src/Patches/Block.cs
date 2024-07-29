@@ -5,7 +5,7 @@ using System;
 
 namespace RaidHours.Patches
 {
-    [HarmonyPatch(typeof(Block), "DamageBlock")]
+    [HarmonyPatch(typeof(Block), nameof(Block.DamageBlock))]
     internal class Block_DamageBlock_Patch
     {
         private static readonly ModLog<Block_DamageBlock_Patch> _log = new ModLog<Block_DamageBlock_Patch>();
