@@ -4,7 +4,7 @@
         <panel width="250" height="92" depth="3" backgroundcolor="[darkGrey]" bordercolor="[black]" controller="HUDStatBar" visible="{cvar(raidHoursBagDropMode:true;false;false)}">
             <grid name="buttons" pos="12, -12" cols="1" width="250" cell_width="250" cell_height="28" arrangement="vertical" repeat_content="false">
                 <label effect="outline" name="logoutWarningHeader" depth="4" width="226" text="[FF8000]Drop Mode Active" font_size="28" />
-                <label effect="outline" name="logoutWarningText" depth="4" width="226" text="While in this hostile land claim, [FF007F]logging out will drop your bag" font_size="20" />
+                <label effect="outline" name="logoutWarningText" depth="4" width="226" text="While in this hostile land claim, [FF0000]logging out will drop your bag" font_size="20" />
             </grid>
         </panel>
     </append>

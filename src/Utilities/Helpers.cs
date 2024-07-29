@@ -16,8 +16,8 @@ namespace RaidHours.Utilities
         public static PlatformUserIdentifierAbs GetUserIdentifier(ClientInfo clientInfo)
         {
             return clientInfo != null
-                ? GameManager.Instance.persistentPlayers.GetPlayerDataFromEntityID(clientInfo.entityId)?.UserIdentifier
-                : GameManager.Instance.persistentLocalPlayer.UserIdentifier;
+                ? GameManager.Instance.persistentPlayers.GetPlayerDataFromEntityID(clientInfo.entityId)?.PrimaryId
+                : GameManager.Instance.persistentLocalPlayer.PrimaryId;
         }
 
         public static PersistentPlayerData GetPersistentPlayerData(ClientInfo clientInfo)
@@ -37,7 +37,7 @@ namespace RaidHours.Utilities
             var playerData = GameManager.Instance.persistentPlayers.GetPlayerDataFromEntityID(playerEntityId);
             if (playerData != null)
             {
-                id = playerData.UserIdentifier;
+                id = playerData.PrimaryId;
                 return true;
             }
             id = null;
@@ -81,7 +81,7 @@ namespace RaidHours.Utilities
 
         public static Relationship GetRelationship(PersistentPlayerData ppData, PlatformUserIdentifierAbs otherPlayerId)
         {
-            return PlatformUserIdentifierAbs.Equals(ppData.UserIdentifier, otherPlayerId)
+            return PlatformUserIdentifierAbs.Equals(ppData.PrimaryId, otherPlayerId)
                 ? Relationship.Self
                 : AreAllies(ppData, otherPlayerId)
                     ? Relationship.Ally
