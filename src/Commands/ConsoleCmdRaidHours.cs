@@ -24,8 +24,8 @@ namespace RaidHours.Commands
                 { "settings", "show raid-hours mod settings" },
                 { "gt", "get current, real-world server time" },
                 { "timezones", "list server-side timezones for your server's operating system" },
-                { "set timezone <string>", "set the timezone; use 'list' to get a list of timezones your operating system supports" },
-                { "set <start/stop> [d=Monday/Tuesday/...] [h=value] [m=value]", "update the start or stop time with the provided rule... d (day of week), (h hour of day), and m (minute of hour) can all be omitted, but m will default to 0 (i.e. top of the hour). NOTE: h is in 24-hr time, so 17 = 5pm." },
+                { "set timezone <string>", "set the timezone; use 'timezones' to get a list of timezones your operating system supports" },
+                { "set <start/stop> [d=Monday/Tuesday/...] [h=value] [m=value]", "update the start or stop time with the provided rule... d (day of week), (h hour of day), and m (minute of hour) can all be omitted, but m will default to 0 (i.e. top of the hour). NOTE: h is in 24-hr time, so 5pm = 17." },
             };
 
             var i = 1; var j = 1;
@@ -91,7 +91,7 @@ namespace RaidHours.Commands
                                         {
                                             ScheduleManager.CheckAndHandleStateChange();
                                         }
-                                        SdtdConsole.Instance.Output($"Updating timezone {(success ? "succeeded and this change was saved" : "failed; please try the 'list' command to view valid options for your operating system; if the timezone you want to use has spaces in it, be sure to wrap that timezone in quotes.")}.");
+                                        SdtdConsole.Instance.Output($"Updating timezone {(success ? "succeeded and this change was saved" : "failed; please try the 'timezones' command to view valid options for your operating system; if the timezone you want to use has spaces in it, be sure to wrap that timezone in quotes.")}.");
                                         return;
                                     }
                                     break;
