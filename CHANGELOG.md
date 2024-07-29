@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.0.0] - TBH
 
+- remove journal tips; deprecated in 1.0
 - update references for 7dtd-1.0-b333
 
 ## [1.0.1] - 2023-06-30
