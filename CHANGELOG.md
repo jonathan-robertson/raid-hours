@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - fix typo, improve clarity in admin commands
 - remove journal tips; deprecated in 1.0
+- update bag drop warning color for color-blind
 - update references for 7dtd-1.0-b333
 
 ## [1.0.1] - 2023-06-30
