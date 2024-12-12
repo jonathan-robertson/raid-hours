@@ -1,19 +1,11 @@
 # Raid Hours
 
-[![🧪 Tested On 7DTD 1.1 (b14)](https://img.shields.io/badge/🧪%20Tested%20On-7DTD%201.1%20(b14)-blue.svg)](https://7daystodie.com/) [![📦 Automated Release](https://github.com/jonathan-robertson/raid-hours/actions/workflows/release.yml/badge.svg)](https://github.com/jonathan-robertson/raid-hours/actions/workflows/release.yml)
+[![🧪 Tested with 7DTD 1.2 (b27)](https://img.shields.io/badge/🧪%20Tested%20with-7DTD%201.2%20(b27)-blue.svg)](https://7daystodie.com/)
+[![✅ Dedicated Servers Supported ServerSide](https://img.shields.io/badge/✅%20Dedicated%20Servers-Supported%20Serverside-blue.svg)](https://7daystodie.com/)
+[![❌ Single Player and P2P Unupported](https://img.shields.io/badge/❌%20Single%20Player%20and%20P2P-Unsupported-red.svg)](https://7daystodie.com/)
+[![📦 Automated Release](https://github.com/jonathan-robertson/raid-hours/actions/workflows/release.yml/badge.svg)](https://github.com/jonathan-robertson/raid-hours/actions/workflows/release.yml)
 
 TODO: ![raid-hours social image](https://raw.githubusercontent.com/jonathan-robertson/raid-hours/media/raid-hours-logo-social.jpg)
-
-- [Raid Hours](#raid-hours)
-  - [Summary](#summary)
-    - [Support](#support)
-  - [Features](#features)
-    - [Scheduled Claim Defense](#scheduled-claim-defense)
-    - [Mob Raid Protection](#mob-raid-protection)
-    - [Squatting/Trap Protection](#squattingtrap-protection)
-    - [Bag Drop Mode](#bag-drop-mode)
-  - [Admin Commands](#admin-commands)
-  - [Compatibility](#compatibility)
 
 ## Summary
 
@@ -31,10 +23,10 @@ A server running Raid Hours will have some special features related to Land Clai
 
 The currently active Claim Mode is displayed as a persistent buff. Select this buff in your character sheet for more info.
 
-Claim Mode | Description
---- | ---
-**Build Mode** | Claimed Land remains protected from hostile player damage.
-**Raid Mode** | Land Claim Defense drops to enable pvp raiding between the hours set by the admin.
+| Claim Mode     | Description                                                                        |
+| -------------- | ---------------------------------------------------------------------------------- |
+| **Build Mode** | Claimed Land remains protected from hostile player damage.                         |
+| **Raid Mode**  | Land Claim Defense drops to enable pvp raiding between the hours set by the admin. |
 
 ### Mob Raid Protection
 
@@ -70,10 +62,10 @@ Each of options would be called with the command `raidhours` or `rh`:
 
 ## Compatibility
 
-Environment | Compatible | Does EAC Need to be Disabled? | Who needs to install?
---- | --- | --- | ---
-Dedicated Server | Yes | No | only server
-Peer-to-Peer Hosting | No | No | N/A
-Single Player | No | No | N/A
+| Environment          | Compatible | Does EAC Need to be Disabled? | Who needs to install? |
+| -------------------- | ---------- | ----------------------------- | --------------------- |
+| Dedicated Server     | Yes        | No                            | only server           |
+| Peer-to-Peer Hosting | No         | No                            | N/A                   |
+| Single Player        | No         | No                            | N/A                   |
 
 > TODO: maybe one day, this mod will be updated to support P2P and SP
